@@ -1,1 +1,7 @@
 project_id = "xawscxdrwzjzghshudpx"
+
+[functions.generate-alternate-self]
+verify_jwt = false
+
+[functions.chat-with-parallel-self]
+verify_jwt = false

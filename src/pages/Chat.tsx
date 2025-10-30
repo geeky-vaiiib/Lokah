@@ -59,14 +59,14 @@ const Chat = () => {
 
       if (existingConv) {
         setConversationId(existingConv.id);
-        setMessages(existingConv.messages || []);
+        setMessages((existingConv.messages as any) || []);
       } else {
         const { data: newConv, error } = await supabase
           .from("conversations")
           .insert({
             user_id: userId,
             alternate_self_id: alternateSelfId,
-            messages: [],
+            messages: [] as any,
           })
           .select()
           .single();
@@ -121,7 +121,7 @@ const Chat = () => {
 
       await supabase
         .from("conversations")
-        .update({ messages: finalMessages })
+        .update({ messages: finalMessages as any })
         .eq("id", conversationId);
     } catch (error: any) {
       toast.error(error.message || "Failed to send message");
