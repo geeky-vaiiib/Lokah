@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.chat-with-parallel-self]
 verify_jwt = false
+
+[functions.generate-reflection]
+verify_jwt = false
+
+[functions.extract-memory]
+verify_jwt = false

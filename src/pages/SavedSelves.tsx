@@ -1,20 +1,31 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, MessageCircle, Loader2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, MessageCircle, Loader2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Timeline } from "@/components/Timeline";
+import logo from "@/assets/logo.png";
 
 const SavedSelves = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [selves, setSelves] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const { data: users } = await supabase.from("users").select("*").limit(1);
+      if (!user) return;
+
+      const { data: users } = await supabase
+        .from("users")
+        .select("*")
+        .eq("auth_user_id", user.id)
+        .limit(1);
       
       if (!users || users.length === 0) {
         navigate("/onboarding");
@@ -40,7 +51,7 @@ const SavedSelves = () => {
     };
 
     loadData();
-  }, [navigate]);
+  }, [navigate, user]);
 
   if (isLoading) {
     return (
@@ -52,38 +63,61 @@ const SavedSelves = () => {
 
   return (
     <div className="min-h-screen p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Your Parallel Selves</h1>
-            <p className="text-muted-foreground">
-              Explore the different versions of you across alternate realities
-            </p>
+          <div className="flex items-center gap-4">
+            <img src={logo} alt="ParallelSelf" className="h-12" />
+            <div>
+              <h1 className="text-4xl font-bold gradient-text">Your Multiverse</h1>
+              <p className="text-muted-foreground/80">
+                All your parallel realities in one place
+              </p>
+            </div>
           </div>
-          <Button
-            onClick={() => navigate("/generator", { state: { userId } })}
-            className="gradient-primary text-white gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Create New Self
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate("/generator", { state: { userId } })}
+              className="gradient-primary text-white gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create New
+            </Button>
+            <Button variant="outline" onClick={signOut} className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
-        {/* Grid of selves */}
+        {/* Tabs: Gallery vs Timeline */}
         {selves.length === 0 ? (
-          <Card className="p-12 text-center shadow-card border-primary/20">
-            <p className="text-xl text-muted-foreground mb-4">
-              You haven't created any parallel selves yet
+          <Card className="p-12 text-center glass-card">
+            <p className="text-xl gradient-text mb-4">
+              Your multiverse awaits
+            </p>
+            <p className="text-muted-foreground/80 mb-6">
+              Create your first parallel self and explore the roads not taken
             </p>
             <Button
               onClick={() => navigate("/generator", { state: { userId } })}
               className="gradient-primary text-white"
             >
-              Create Your First Parallel Self
+              Step Through the Mirror
             </Button>
           </Card>
         ) : (
+          <Tabs defaultValue="gallery" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+              <TabsTrigger value="gallery">Gallery View</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="timeline" className="mt-8">
+              <Timeline selves={selves} userId={userId || ""} />
+            </TabsContent>
+
+            <TabsContent value="gallery">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {selves.map((self) => {
               const lastMessage = self.conversations?.[0]?.messages?.slice(-1)[0];
@@ -127,6 +161,8 @@ const SavedSelves = () => {
               );
             })}
           </div>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ const TOTAL_STEPS = 5;
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -46,6 +48,12 @@ const Onboarding = () => {
   };
 
   const handleComplete = async () => {
+    if (!user) {
+      toast.error("Please sign in first");
+      navigate("/auth");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -58,13 +66,14 @@ const Onboarding = () => {
           values: formData.values.split(",").map((v) => v.trim()),
           major_choices: [formData.majorChoice],
           unchosen_path: formData.unchosenPath,
+          auth_user_id: user.id,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      toast.success("Profile created successfully!");
+      toast.success("Your story has been captured");
       navigate("/generator", { state: { userId: data.id } });
     } catch (error: any) {
       toast.error(error.message || "Failed to create profile");
@@ -225,22 +234,22 @@ const Onboarding = () => {
         </div>
 
         {/* Main card */}
-        <Card className="p-8 shadow-card border-primary/20 animate-scale-in">
+        <Card className="p-8 glass-card animate-scale-in">
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold text-foreground mb-2">
+              <h2 className="text-2xl font-semibold gradient-text mb-2">
                 {currentStep === 1 && "Let's get to know you"}
                 {currentStep === 2 && "A bit more about you"}
                 {currentStep === 3 && "What matters most to you?"}
                 {currentStep === 4 && "Your life's turning points"}
                 {currentStep === 5 && "The road not taken"}
               </h2>
-              <p className="text-muted-foreground">
-                {currentStep === 1 && "Tell us your name and age to personalize your experience."}
-                {currentStep === 2 && "These details help us create a more authentic parallel self."}
-                {currentStep === 3 && "Your values shape who you are across all realities."}
-                {currentStep === 4 && "Every choice creates a fork in the path of life."}
-                {currentStep === 5 && "This is where your parallel self begins to diverge."}
+              <p className="text-muted-foreground/80">
+                {currentStep === 1 && "Share your name so your parallel self knows who you are."}
+                {currentStep === 2 && "These details help create an authentic connection."}
+                {currentStep === 3 && "Your values remain constant across all realities."}
+                {currentStep === 4 && "Every choice creates a new branch in the multiverse."}
+                {currentStep === 5 && "Here is where your parallel self begins to diverge."}
               </p>
             </div>
 
@@ -273,7 +282,7 @@ const Onboarding = () => {
                   disabled={!canProceed() || isLoading}
                   className="gradient-primary text-white transition-smooth"
                 >
-                  {isLoading ? "Creating..." : "Create My Parallel Self"}
+                  {isLoading ? "Weaving the threads..." : "Enter the Multiverse"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}

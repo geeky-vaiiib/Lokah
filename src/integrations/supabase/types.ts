@@ -94,9 +94,124 @@ export type Database = {
           },
         ]
       }
+      memory_snippets: {
+        Row: {
+          alternate_self_id: string
+          content: string
+          conversation_id: string
+          created_at: string
+          emotional_tone: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          alternate_self_id: string
+          content: string
+          conversation_id: string
+          created_at?: string
+          emotional_tone?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          alternate_self_id?: string
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          emotional_tone?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_snippets_alternate_self_id_fkey"
+            columns: ["alternate_self_id"]
+            isOneToOne: false
+            referencedRelation: "alternate_selves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memory_snippets_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reflections: {
+        Row: {
+          alternate_self_id: string
+          conversation_id: string
+          created_at: string
+          id: string
+          insights: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alternate_self_id: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          insights?: Json
+          title: string
+          user_id: string
+        }
+        Update: {
+          alternate_self_id?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          insights?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflections_alternate_self_id_fkey"
+            columns: ["alternate_self_id"]
+            isOneToOne: false
+            referencedRelation: "alternate_selves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reflections_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           age: number | null
+          auth_user_id: string | null
           created_at: string
           gender: string | null
           id: string
@@ -108,6 +223,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          auth_user_id?: string | null
           created_at?: string
           gender?: string | null
           id?: string
@@ -119,6 +235,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          auth_user_id?: string | null
           created_at?: string
           gender?: string | null
           id?: string
