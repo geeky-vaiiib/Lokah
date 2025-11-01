@@ -1,14 +1,16 @@
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo.png";
+import { Logo } from "@/components/Logo";
+import { MotionWrapper } from "@/components/MotionWrapper";
+import heroBackground from "@/assets/hero-background.png";
 
 const Welcome = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -19,46 +21,80 @@ const Welcome = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "4s" }} />
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+      {/* Hero background */}
+      <div 
+        className="absolute inset-0 -z-10 opacity-30"
+        style={{
+          backgroundImage: `url(${heroBackground})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
+      {/* Animated overlay elements */}
+      <div className="absolute inset-0 -z-10">
+        <motion.div 
+          className="absolute top-20 left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 text-center space-y-8 max-w-3xl animate-fade-up">
-        {/* Logo */}
-        <div className="mb-8 animate-scale-in">
-          <img src={logo} alt="ParallelSelf" className="h-24 mx-auto" />
-        </div>
+      <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
+        <MotionWrapper animation="scale" delay={0.1}>
+          <Logo variant="stacked" size="lg" animated />
+        </MotionWrapper>
         
-        <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-fade-in gradient-text">
-          Step Through the Mirror
-        </h1>
+        <MotionWrapper animation="fadeUp" delay={0.3}>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold gradient-text leading-tight">
+            Step Through the Mirror
+          </h1>
+        </MotionWrapper>
         
-        <p className="text-xl text-muted-foreground mb-8 animate-fade-in leading-relaxed" style={{ animationDelay: "0.2s" }}>
-          Meet the versions of you from parallel realities.<br />
-          Explore the choices you didn't make.<br />
-          Discover the lives you didn't live.
-        </p>
+        <MotionWrapper animation="fadeUp" delay={0.5}>
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Meet the version of you who chose differently
+          </p>
+        </MotionWrapper>
 
-        <div className="flex gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
-          <Button
-            onClick={() => navigate("/auth")}
-            size="lg"
-            className="gradient-primary text-white text-lg px-8 py-6 hover:scale-105 transition-transform"
-          >
-            Enter the Multiverse
-          </Button>
-        </div>
+        <MotionWrapper animation="fadeUp" delay={0.7}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button 
+              size="lg"
+              onClick={() => navigate("/auth")}
+              className="gradient-primary text-white text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-full shadow-card hover:shadow-elevated transition-all hover:scale-105"
+            >
+              Enter the Multiverse
+            </Button>
+          </div>
+        </MotionWrapper>
 
-        <div className="mt-12 space-y-2 text-sm text-muted-foreground/80 animate-fade-in" style={{ animationDelay: "0.6s" }}>
-          <p className="italic">What if you had chosen differently?</p>
-          <p className="italic">What if you had taken that other path?</p>
-          <p className="italic">What would your life look like... in another reality?</p>
-        </div>
+        <MotionWrapper animation="fade" delay={0.9}>
+          <p className="text-xs sm:text-sm md:text-base text-muted-foreground/80 italic pt-8 leading-relaxed">
+            What would you have become if you had chosen a different path?<br />
+            Who would you be if that one moment had gone differently?
+          </p>
+        </MotionWrapper>
       </div>
     </div>
   );
