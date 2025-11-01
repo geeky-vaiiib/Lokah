@@ -3,15 +3,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2, Home } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Send, Loader2, Home, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileCard from "@/components/ProfileCard";
+import { MemorySnippetBadge } from "@/components/MemorySnippetBadge";
+import { ReflectionCard } from "@/components/ReflectionCard";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  memorySnippet?: {
+    content: string;
+    emotional_tone: string;
+  };
+}
+
+interface Reflection {
+  title: string;
+  insights: string[];
+  emotional_tone: string;
 }
 
 const Chat = () => {
@@ -25,6 +38,9 @@ const Chat = () => {
   const [alternateSelf, setAlternateSelf] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [reflection, setReflection] = useState<Reflection | null>(null);
+  const [showReflectionModal, setShowReflectionModal] = useState(false);
+  const [isGeneratingReflection, setIsGeneratingReflection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -116,6 +132,19 @@ const Chat = () => {
         timestamp: new Date().toISOString(),
       };
 
+      // Extract memory snippet for this message
+      try {
+        const { data: memoryData } = await supabase.functions.invoke("extract-memory", {
+          body: { messageContent: data.reply },
+        });
+
+        if (memoryData?.memory?.content) {
+          assistantMessage.memorySnippet = memoryData.memory;
+        }
+      } catch (memoryError) {
+        console.log("Memory extraction skipped:", memoryError);
+      }
+
       const finalMessages = [...updatedMessages, assistantMessage];
       setMessages(finalMessages);
 
@@ -127,6 +156,68 @@ const Chat = () => {
       toast.error(error.message || "Failed to send message");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateReflection = async () => {
+    if (!conversationId || !alternateSelf || messages.length < 2) {
+      toast.error("Have a longer conversation before generating a reflection");
+      return;
+    }
+
+    setIsGeneratingReflection(true);
+
+    try {
+      const { data: reflectionData, error: reflectionError } = await supabase.functions.invoke(
+        "generate-reflection",
+        {
+          body: {
+            messages,
+            alternateSelfData: {
+              axis: alternateSelf.axis,
+              divergence_summary: alternateSelf.divergence_summary,
+              backstory: alternateSelf.backstory,
+            },
+          },
+        }
+      );
+
+      if (reflectionError) throw reflectionError;
+
+      // Save reflection to database
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData.user) {
+        await supabase.from("reflections").insert({
+          user_id: authData.user.id,
+          alternate_self_id: alternateSelf.id,
+          conversation_id: conversationId,
+          title: reflectionData.reflection.title,
+          insights: reflectionData.reflection.insights,
+        });
+
+        // Save memory snippets to database
+        const memorySnippets = messages
+          .filter((m) => m.role === "assistant" && m.memorySnippet)
+          .map((m) => ({
+            user_id: authData.user.id,
+            alternate_self_id: alternateSelf.id,
+            conversation_id: conversationId,
+            content: m.memorySnippet!.content,
+            emotional_tone: m.memorySnippet!.emotional_tone,
+          }));
+
+        if (memorySnippets.length > 0) {
+          await supabase.from("memory_snippets").insert(memorySnippets);
+        }
+      }
+
+      setReflection(reflectionData.reflection);
+      setShowReflectionModal(true);
+      toast.success("✨ Reflection generated");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to generate reflection");
+    } finally {
+      setIsGeneratingReflection(false);
     }
   };
 
@@ -144,10 +235,21 @@ const Chat = () => {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold">Chat with Your Parallel Self</h1>
-          <Button variant="outline" onClick={() => navigate("/saved")} className="gap-2">
-            <Home className="h-4 w-4" />
-            My Parallel Selves
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleGenerateReflection}
+              disabled={isGeneratingReflection || messages.length < 2}
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isGeneratingReflection ? "Reflecting..." : "Save & Reflect"}
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/saved")} className="gap-2">
+              <Home className="h-4 w-4" />
+              My Parallel Selves
+            </Button>
+          </div>
         </div>
 
         {/* Main layout */}
@@ -172,7 +274,7 @@ const Chat = () => {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                    className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}
                   >
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
@@ -183,6 +285,12 @@ const Chat = () => {
                     >
                       <p className="text-sm leading-relaxed">{message.content}</p>
                     </div>
+                    {message.memorySnippet && (
+                      <MemorySnippetBadge
+                        text={message.memorySnippet.content}
+                        emotionalTone={message.memorySnippet.emotional_tone}
+                      />
+                    )}
                   </div>
                 ))}
 
@@ -220,6 +328,22 @@ const Chat = () => {
           </div>
         </div>
       </div>
+
+      {/* Reflection Modal */}
+      <Dialog open={showReflectionModal} onOpenChange={setShowReflectionModal}>
+        <DialogContent className="max-w-2xl glass-card border-primary/30">
+          <DialogHeader>
+            <DialogTitle className="text-2xl gradient-text">Your Journey's Reflection</DialogTitle>
+          </DialogHeader>
+          {reflection && <ReflectionCard reflection={reflection} />}
+          <Button
+            onClick={() => setShowReflectionModal(false)}
+            className="gradient-primary text-white mt-4"
+          >
+            Return to Mirror
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
