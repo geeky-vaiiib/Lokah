@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { MotionWrapper } from "@/components/MotionWrapper";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sparkles, Users, MessageCircle, Share2 } from "lucide-react";
 import heroBg from "@/assets/lokah-hero-bg.png";
 
@@ -63,6 +64,11 @@ const Welcome = () => {
       
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+        {/* Theme Toggle */}
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
+
         <div className="w-full max-w-5xl mx-auto space-y-12">
           {/* Hero Section */}
           <MotionWrapper animation="fadeUp" delay={0} className="text-center space-y-6">
@@ -128,12 +134,26 @@ const Welcome = () => {
               Every choice births another you
             </p>
             <p className="text-sm text-muted-foreground/60 max-w-2xl mx-auto">
-              Lokah creates safe, emotionally intelligent spaces for self-reflection and growth. 
+              Lokah creates safe, emotionally intelligent spaces for self-reflection and growth.
               Your conversations are private, your insights are yours to keep and share as you choose.
             </p>
           </MotionWrapper>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative z-10 p-6 text-center space-y-2">
+        <p className="text-muted-foreground/80 italic">
+          LO◯KAH — In stillness, you find your parallel self.
+        </p>
+        <Button
+          variant="link"
+          onClick={() => navigate("/about")}
+          className="text-muted-foreground/60 hover:text-primary transition-colors text-sm"
+        >
+          Learn about our philosophy
+        </Button>
+      </footer>
     </div>
   );
 };
