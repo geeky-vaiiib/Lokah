@@ -212,37 +212,130 @@ export type Database = {
         Row: {
           age: number | null
           auth_user_id: string | null
+          birth_year: number | null
+          career_highlight: string | null
+          children: number | null
+          city: string | null
+          completed_at: string | null
+          content_sensitivity_preference: string
+          country: string | null
           created_at: string
+          current_economic_status: string | null
+          current_occupation: string | null
+          defining_moments: string[]
+          display_name_preference: string
+          employment_security: string | null
+          ethnicity: string | null
+          family_economic_background: string | null
+          family_issues: string[]
+          family_issues_notes: string | null
+          family_status: string | null
+          field_of_study: string | null
           gender: string | null
+          has_experienced_trauma: boolean | null
+          highest_education: string | null
+          household_members: string | null
           id: string
+          languages_spoken: string[]
+          life_challenges: string | null
+          life_regret: string | null
           location: string | null
           major_choices: string[]
           name: string
-          unchosen_path: string
+          personality_vector: Json | null
+          pronouns: string | null
+          religion_or_spirituality: string | null
+          share_anonymized: boolean | null
+          state: string | null
+          store_memories: boolean | null
+          trauma_brief_note: string | null
+          unchosen_path: string | null
           values: string[]
         }
         Insert: {
           age?: number | null
           auth_user_id?: string | null
+          birth_year?: number | null
+          career_highlight?: string | null
+          children?: number | null
+          city?: string | null
+          completed_at?: string | null
+          content_sensitivity_preference?: string
+          country?: string | null
           created_at?: string
+          current_economic_status?: string | null
+          current_occupation?: string | null
+          defining_moments?: string[]
+          display_name_preference?: string
+          employment_security?: string | null
+          ethnicity?: string | null
+          family_economic_background?: string | null
+          family_issues?: string[]
+          family_issues_notes?: string | null
+          family_status?: string | null
+          field_of_study?: string | null
           gender?: string | null
+          has_experienced_trauma?: boolean | null
+          highest_education?: string | null
+          household_members?: string | null
           id?: string
+          languages_spoken?: string[]
+          life_challenges?: string | null
+          life_regret?: string | null
           location?: string | null
           major_choices?: string[]
           name: string
-          unchosen_path: string
+          personality_vector?: Json | null
+          pronouns?: string | null
+          religion_or_spirituality?: string | null
+          share_anonymized?: boolean | null
+          state?: string | null
+          store_memories?: boolean | null
+          trauma_brief_note?: string | null
+          unchosen_path?: string | null
           values?: string[]
         }
         Update: {
           age?: number | null
           auth_user_id?: string | null
+          birth_year?: number | null
+          career_highlight?: string | null
+          children?: number | null
+          city?: string | null
+          completed_at?: string | null
+          content_sensitivity_preference?: string
+          country?: string | null
           created_at?: string
+          current_economic_status?: string | null
+          current_occupation?: string | null
+          defining_moments?: string[]
+          display_name_preference?: string
+          employment_security?: string | null
+          ethnicity?: string | null
+          family_economic_background?: string | null
+          family_issues?: string[]
+          family_issues_notes?: string | null
+          family_status?: string | null
+          field_of_study?: string | null
           gender?: string | null
+          has_experienced_trauma?: boolean | null
+          highest_education?: string | null
+          household_members?: string | null
           id?: string
+          languages_spoken?: string[]
+          life_challenges?: string | null
+          life_regret?: string | null
           location?: string | null
           major_choices?: string[]
           name?: string
-          unchosen_path?: string
+          personality_vector?: Json | null
+          pronouns?: string | null
+          religion_or_spirituality?: string | null
+          share_anonymized?: boolean | null
+          state?: string | null
+          store_memories?: boolean | null
+          trauma_brief_note?: string | null
+          unchosen_path?: string | null
           values?: string[]
         }
         Relationships: []
