@@ -45,7 +45,7 @@ const Auth = () => {
         });
         
         if (error) throw error;
-        toast.success("Welcome to ParallelSelf! Sign in to continue.");
+        toast.success("Welcome to Lokah! Sign in to continue.");
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -54,7 +54,7 @@ const Auth = () => {
         });
         
         if (error) throw error;
-        toast.success("Welcome back to your multiverse.");
+        toast.success("Welcome back to Lokah.");
         navigate("/");
       }
     } catch (error: any) {

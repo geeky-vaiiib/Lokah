@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import logoMark from "@/assets/logo-mark.png";
-import logoHorizontal from "@/assets/logo-horizontal.png";
+import logoMark from "@/assets/lokah-mark.png";
+import logoHorizontal from "@/assets/lokah-horizontal.png";
 
 interface LogoProps {
   variant?: "mark" | "horizontal" | "stacked";
@@ -31,7 +31,7 @@ export function Logo({
       >
         <img 
           src={logoMark} 
-          alt="ParallelSelf" 
+          alt="Lokah - Discover Your Parallel Self" 
           className={sizeClasses[size]}
         />
       </motion.div>
@@ -48,7 +48,7 @@ export function Logo({
       >
         <img 
           src={logoHorizontal} 
-          alt="ParallelSelf - Meet the version of you who chose differently" 
+          alt="Lokah - Discover Your Parallel Self" 
           className={sizeClasses[size]}
         />
       </motion.div>
@@ -78,7 +78,7 @@ export function Logo({
         } : undefined}
       />
       <span className="text-lg font-semibold" style={{ fontFamily: 'Poppins' }}>
-        ParallelSelf
+        Lokah
       </span>
     </motion.div>
   );

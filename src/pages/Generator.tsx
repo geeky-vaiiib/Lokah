@@ -95,7 +95,7 @@ const Generator = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-accent shadow-card">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold">Choose Your Divergence</h1>
+          <span className="gradient-text">Step Through the Mirror</span>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             Select the axis where your life could have taken a different turn. 
             Your parallel self will emerge from this choice.
