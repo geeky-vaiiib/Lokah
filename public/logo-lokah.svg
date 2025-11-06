@@ -1,0 +1,37 @@
+<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" class="lokah-wordmark-svg">
+  <defs>
+    <style>
+      @media (prefers-reduced-motion: reduce) {
+        .animated-o { animation: none; }
+      }
+    </style>
+    <linearGradient id="lokah-text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F3E9B0" />
+      <stop offset="50%" stop-color="#6AE7E6" />
+      <stop offset="100%" stop-color="#F3E9B0" />
+    </linearGradient>
+    <radialGradient id="o-portal-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6AE7E6" stop-opacity="0.9" />
+      <stop offset="70%" stop-color="#F3E9B0" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#071d26" stop-opacity="0.1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- L O K A H text -->
+  <text x="10" y="55" font-family="Playfair Display, serif" font-size="48" font-weight="600" fill="url(#lokah-text-grad)" letter-spacing="2">
+    L O K A H
+  </text>
+  
+  <!-- Animated O with rotating needle -->
+  <g class="animated-o" style="animation: rotate-portal 40s linear infinite;">
+    <circle cx="78" cy="40" r="18" fill="none" stroke="url(#o-portal-grad)" stroke-width="2.5" opacity="0.8"/>
+    <line x1="78" y1="25" x2="78" y2="55" stroke="#F3E9B0" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  </g>
+</svg>
+
+<style>
+@keyframes rotate-portal {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +14,8 @@ import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { MotionWrapper } from "@/components/MotionWrapper";
-import { Logo } from "@/components/Logo";
+import Logo from "@/components/Logo";
+import LogoWordmark from "@/components/LogoWordmark";
 
 const TOTAL_STEPS = 8;
 
@@ -110,7 +112,7 @@ const Onboarding = () => {
     try {
       const { data, error } = await supabase
         .from("users")
-        .insert({
+        .upsert({
           name: formData.name,
           age: formData.age ? parseInt(formData.age) : null,
           gender: formData.gender || null,
@@ -459,7 +461,7 @@ const Onboarding = () => {
                 htmlFor="allowDataUsage"
                 className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                I consent to Lokah using my data to create meaningful parallel self experiences
+                I consent to Lokah using my data to create meaningful Alternate Self experiences
               </label>
             </div>
           </MotionWrapper>
@@ -516,12 +518,17 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
+      {/* Animated Lokah background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A] animate-[lokahGradientShift_50s_linear_infinite] bg-[length:200%_200%]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(113,208,227,0.15)_0%,transparent_80%)] blur-3xl" />
       <div className="w-full max-w-2xl space-y-6">
         {/* Header */}
         <MotionWrapper animation="fadeUp" className="text-center">
-          <Logo variant="mark" size="md" className="mx-auto mb-4" />
-          <p className="text-muted-foreground">Building your parallel self</p>
+          <div className="mx-auto mb-4">
+            <LogoWordmark size={28} />
+          </div>
+          <p className="text-muted-foreground">Preparing your Alternate Self</p>
         </MotionWrapper>
 
         {/* Progress bar */}
@@ -534,13 +541,13 @@ const Onboarding = () => {
         </div>
 
         {/* Main card */}
-        <Card className="p-8 glass-card">
+        <div className="rounded-3xl bg-[#0F1623]/60 border border-white/10 backdrop-blur-md shadow-[0_0_20px_rgba(113,208,227,0.15)] p-8">
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold gradient-text mb-2">
+              <h2 className="text-2xl font-[ClashDisplay] bg-clip-text text-transparent bg-gradient-to-r from-[#B693FF] to-[#71D0E3] mb-2">
                 {getStepTitle()}
               </h2>
-              <p className="text-muted-foreground/80">
+              <p className="text-[#A6CFFF] mb-6">
                 {getStepDescription()}
               </p>
             </div>
@@ -548,48 +555,33 @@ const Onboarding = () => {
             {renderStep()}
 
             {/* Navigation buttons */}
-            <div className="flex justify-between pt-4">
-              <Button
-                variant="outline"
+            <div className="flex justify-between pt-4 gap-3">
+              <GlassButton
+                variant="secondary"
                 onClick={handleBack}
                 disabled={currentStep === 1}
-                className="transition-smooth"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
+                label="Back"
+                className="min-w-[120px]"
+              />
 
               {currentStep < TOTAL_STEPS ? (
-                <Button
+                <GlassButton
                   onClick={handleNext}
                   disabled={!canProceed()}
-                  className="gradient-primary text-white transition-smooth"
-                >
-                  Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                  label="Continue"
+                  className="min-w-[140px]"
+                />
               ) : (
-                <Button
+                <GlassButton
                   onClick={handleComplete}
                   disabled={!canProceed() || isLoading}
-                  className="gradient-primary text-white transition-smooth"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating your parallel self...
-                    </>
-                  ) : (
-                    <>
-                      Begin Your Journey
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
+                  label={isLoading ? "Creating..." : "Begin with Lokah"}
+                  className="min-w-[180px]"
+                />
               )}
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

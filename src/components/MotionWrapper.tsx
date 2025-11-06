@@ -14,9 +14,9 @@ const animations = {
     exit: { opacity: 0 },
   },
   fadeUp: {
-    initial: { opacity: 0, y: 20 },
+    initial: { opacity: 0, y: 40 },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 20 },
+    exit: { opacity: 0, y: 40 },
   },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
@@ -40,9 +40,9 @@ export function MotionWrapper({
     <motion.div
       {...animations[animation]}
       transition={{
-        duration: 0.3,
+        duration: 1.2,
         delay,
-        ease: [0.4, 0, 0.2, 1],
+        ease: 'easeOut',
       }}
       {...props}
     >

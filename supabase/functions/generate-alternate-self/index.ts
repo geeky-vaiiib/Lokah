@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,8 +21,24 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Create prompt for generating alternate backstory
-    const prompt = `Create a believable alternate-reality version of ${userData.name}.
+  // Create prompt for generating alternate backstory using shared base prompt
+  const lokahBasePrompt = LOKAH_SYSTEM_PROMPT;
+    const prompt = `You are creating a parallel self — an alternate version of ${userData.name} from another timeline.
+Think, talk, and feel like a real human version of them — not like a narrator or writer.
+
+Your tone is conversational, natural, and introspective — like sharing a story with an old friend.
+
+Keep responses authentic and human — use contractions, casual grammar, real emotions.
+Avoid long paragraphs, dramatic monologues, or excessive reflection.
+
+Focus on sounding human — self-awareness, warmth, grounded personality.
+
+Style rules:
+- Shorter descriptions (2–6 sentences for backstory)
+- Conversational structure — natural rhythm, not perfect grammar
+- Avoid poetic or essay-like phrasing
+- No narration like "He said" or "You see," or "There's a quiet pride…"
+- Keep it subtle, like an old friend reminiscing
 
 Facts about real user:
 - Core values: ${userData.values.join(', ')}
@@ -29,12 +47,13 @@ Facts about real user:
 
 Task:
 Invent an alternate version of their life where one major decision changed on the ${axis} axis.
+Write in first-person as if you ARE this alternate version sharing their story naturally.
+
 Describe:
-1. How the divergence happened.
-2. Their alternate career, home, and relationships.
-3. One big success and one regret.
-4. Their current worldview.
-5. Keep the tone vivid, introspective, and first-person.
+1. How the divergence happened (keep it real and conversational)
+2. Their alternate career, home, and relationships (everyday details)
+3. One big success and one regret (honest, not dramatic)
+4. Their current worldview (thoughtful but casual)
 
 Output in JSON format:
 {
@@ -53,17 +72,13 @@ Output in JSON format:
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          {
-            role: 'system',
-            content: 'You are a creative writer specializing in alternate reality narratives. Always respond with valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
+          { role: 'system', content: lokahBasePrompt },
+          { role: 'system', content: 'You are a creative writer specializing in alternate reality narratives. Always respond with valid JSON only.' },
+          { role: 'user', content: JSON.stringify({ task: 'generate_parallel_self', axis, user: userData }) },
+          { role: 'user', content: prompt }
         ],
-        temperature: 0.9,
-        max_tokens: 1500,
+        temperature: 0.6,
+        max_tokens: 900,
       }),
     });
 

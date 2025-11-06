@@ -42,7 +42,7 @@ const SavedSelves = () => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        toast.error("Failed to load your parallel selves");
+  toast.error("Failed to load your alternate selves");
       } else {
         setSelves(data || []);
       }
@@ -67,11 +67,11 @@ const SavedSelves = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <img src={logo} alt="ParallelSelf" className="h-12" />
+            <img src={logo} alt="Lokah" className="h-12" />
             <div>
-              <h1 className="text-4xl font-bold gradient-text">Your Multiverse</h1>
+              <h1 className="text-4xl font-bold gradient-text">Lokah</h1>
               <p className="text-muted-foreground/80">
-                All your parallel realities in one place
+                Explore the worlds where you might have been
               </p>
             </div>
           </div>
@@ -94,10 +94,10 @@ const SavedSelves = () => {
         {selves.length === 0 ? (
           <Card className="p-12 text-center glass-card">
             <p className="text-xl gradient-text mb-4">
-              Your multiverse awaits
+              Your Worlds await
             </p>
             <p className="text-muted-foreground/80 mb-6">
-              Create your first parallel self and explore the roads not taken
+              Create your first Alternate Self and explore the roads not taken
             </p>
             <Button
               onClick={() => navigate("/generator", { state: { userId } })}
@@ -136,7 +136,7 @@ const SavedSelves = () => {
                       <div className="inline-block px-3 py-1 rounded-full text-xs font-medium gradient-accent text-white mb-3 capitalize">
                         {self.axis}
                       </div>
-                      <h3 className="text-xl font-semibold mb-2">Parallel Self</h3>
+                      <h3 className="text-xl font-semibold mb-2">Alternate Self</h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {self.divergence_summary}
                       </p>

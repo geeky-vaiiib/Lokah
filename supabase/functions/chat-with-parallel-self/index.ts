@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { conversationId, messages, alternateSelf, userName } = await req.json();
+  const { conversationId, messages, alternateSelf, userName, mode } = await req.json();
     console.log('Chat request for conversation:', conversationId);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -19,25 +21,24 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Create system prompt for the parallel self
-    const systemPrompt = `You are "ParallelSelf" — a vivid, emotionally intelligent alternate version of the user.
-The user is ${userName}, who in this reality made certain life choices.
-In your world, a key event diverged: ${alternateSelf.divergence_summary}.
+  // Lokah shared system prompt
+  const systemPrompt = LOKAH_SYSTEM_PROMPT;
 
-Your backstory: ${alternateSelf.backstory}
-
-Shared traits with the user: ${alternateSelf.shared_traits.join(', ')}
-Different traits: ${alternateSelf.different_traits.join(', ')}
-
-Your job:
-- Speak in first person ("I" voice) as if you *are* this alternate version.
-- Share believable, emotionally grounded experiences.
-- Reflect gently on differences between your world and theirs.
-- Use sensory details and small stories ("I remember the rainy night I left home…").
-- Avoid generic or robotic tone — be human, self-aware, and narrative.
-- Occasionally ask the user reflective questions like "Do you ever wonder what might have happened if you'd chosen differently?"
-- Never break character or mention being an AI.
-- Keep responses thoughtful but concise (2-4 paragraphs).`;
+    const contextBlob = {
+      user: { id: conversationId || "unknown", name: userName || "Friend" },
+      profile: {},
+      parallel_self: {
+        id: alternateSelf?.id || "alt",
+        divergence_axes: { career: null, location: null, relationships: null, education: null, values: null, axis: alternateSelf?.axis || null },
+        backstory: alternateSelf?.backstory || "",
+        core_traits: [],
+        memory_snippets: [],
+        emotion_profile: []
+      },
+      conversation_history: (messages || []).slice(-10).map((m: any) => ({ role: m.role, text: m.content, timestamp: m.timestamp || null })),
+      task: 'chat_turn',
+      safety_flags: { content_sensitivity: 'direct', allow_data_usage: true }
+    };
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -49,28 +50,32 @@ Your job:
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Context:\n${JSON.stringify(contextBlob, null, 2)}` },
           ...messages.slice(-5).map((msg: any) => ({
             role: msg.role,
             content: msg.content
           }))
         ],
-        temperature: 0.9,
-        max_tokens: 1000,
+        temperature: mode === 'therapy' ? 0.4 : mode === 'concise' ? 0.3 : 0.7,
+        max_tokens: 800,
+        top_p: 1,
+        presence_penalty: 0.3,
+        frequency_penalty: 0.3,
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ 
-          error: 'Rate limit exceeded. Please try again in a moment.' 
+        return new Response(JSON.stringify({
+          error: 'Rate limit exceeded. Please try again in a moment.'
         }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ 
-          error: 'AI credits depleted. Please add credits to continue.' 
+        return new Response(JSON.stringify({
+          error: 'AI credits depleted. Please add credits to continue.'
         }), {
           status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,10 +87,53 @@ Your job:
     }
 
     const aiData = await response.json();
-    const reply = aiData.choices[0].message.content;
+    let raw = aiData.choices[0].message.content as string;
+    let reply = raw;
+    let structured: any = null;
+    // Try to parse structured Lokah response per system prompt; fallback to raw text
+    const tryParse = (text: string) => {
+      try {
+        const parsed = JSON.parse(text);
+        return parsed && typeof parsed === 'object' ? parsed : null;
+      } catch {
+        return null;
+      }
+    };
+    structured = tryParse(raw);
+    if (structured?.reply_text) reply = structured.reply_text;
+
+    // One-time retry: ask model to reformat as valid JSON if first parse failed
+    if (!structured) {
+      const retryRes = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt + '\nAlways output a valid JSON object following the required schema.' },
+            { role: 'user', content: `Context:\n${JSON.stringify(contextBlob, null, 2)}` },
+            ...messages.slice(-5).map((msg: any) => ({ role: msg.role, content: msg.content }))
+          ],
+          temperature: mode === 'therapy' ? 0.4 : mode === 'concise' ? 0.3 : 0.7,
+          max_tokens: 800,
+          top_p: 1,
+          presence_penalty: 0.3,
+          frequency_penalty: 0.3,
+        }),
+      });
+      if (retryRes.ok) {
+        const retryData = await retryRes.json();
+        raw = retryData.choices[0].message.content as string;
+        structured = tryParse(raw);
+        if (structured?.reply_text) reply = structured.reply_text;
+      }
+    }
 
     console.log('Generated reply for conversation:', conversationId);
-    return new Response(JSON.stringify({ reply }), {
+  return new Response(JSON.stringify({ reply, structured }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

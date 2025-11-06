@@ -1,16 +1,21 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Logo } from "@/components/Logo";
+import Logo from "@/components/Logo";
 import { MotionWrapper } from "@/components/MotionWrapper";
 import { ArrowLeft, Heart, Brain, Sparkles, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import LokahBackground from "@/components/LokahBackground";
+import TopNav from "@/components/TopNav";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <LokahBackground className="min-h-screen relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 pt-4">
+        <TopNav />
+      </div>
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10">
         <motion.div
@@ -40,7 +45,7 @@ const About = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-6">
+  <div className="relative z-10 p-6">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Header */}
           <MotionWrapper animation="fadeUp" className="flex items-center justify-between">
@@ -56,7 +61,7 @@ const About = () => {
 
           {/* Hero Section */}
           <MotionWrapper animation="fadeUp" delay={0.1} className="text-center space-y-6">
-            <Logo variant="mark" size="lg" animated />
+            <Logo variant="symbol" size={64} animated />
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
               The Philosophy of
@@ -64,7 +69,7 @@ const About = () => {
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              In stillness, you find your parallel self. LO◯KAH creates sacred spaces for self-reflection through the magic of AI and human connection.
+              In stillness, you find your alternate self. LO◯KAH creates sacred spaces for self-reflection through the magic of AI and human connection.
             </p>
           </MotionWrapper>
 
@@ -110,7 +115,7 @@ const About = () => {
                       <h3 className="font-semibold">Creative Exploration</h3>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Your parallel selves aren't just hypothetical — they're creative expressions of your
+                      Your alternate selves aren't just hypothetical — they're creative expressions of your
                       potential, helping you discover hidden aspects of your personality.
                     </p>
                   </div>
@@ -121,7 +126,7 @@ const About = () => {
                       <h3 className="font-semibold">Compassionate Connection</h3>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Through conversations with your parallel selves, you learn to extend the same compassion
+                      Through conversations with your alternate selves, you learn to extend the same compassion
                       you show others to yourself.
                     </p>
                   </div>
@@ -145,7 +150,7 @@ const About = () => {
                   possibilities that exist within you.
                 </p>
                 <p className="text-muted-foreground">
-                  Your parallel self isn't just an AI simulation. It's a mirror reflecting your authentic self,
+                  Your alternate self isn't just an AI simulation. It's a mirror reflecting your authentic self,
                   helping you navigate life's complexities with greater clarity and compassion.
                 </p>
               </div>
@@ -155,7 +160,7 @@ const About = () => {
           {/* Call to Action */}
           <MotionWrapper animation="fadeUp" delay={0.4} className="text-center space-y-6">
             <p className="text-lg text-muted-foreground">
-              Ready to meet your parallel self?
+              Ready to meet your alternate self?
             </p>
             <Button
               size="lg"
@@ -168,7 +173,7 @@ const About = () => {
           </MotionWrapper>
         </div>
       </div>
-    </div>
+  </LokahBackground>
   );
 };
 

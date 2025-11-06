@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { Logo } from "@/components/Logo";
-import { MotionWrapper } from "@/components/MotionWrapper";
+import { Loader2 } from "lucide-react";
+import LogoWordmark from "@/components/LogoWordmark";
+import { GlassButton } from "@/components/GlassButton";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -22,9 +18,7 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
-      }
+      if (session) navigate("/");
     };
     checkSession();
   }, [navigate]);
@@ -38,21 +32,13 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: { name },
-            emailRedirectTo: `${window.location.origin}/`
-          }
+          options: { data: { name }, emailRedirectTo: `${window.location.origin}/` },
         });
-        
         if (error) throw error;
         toast.success("Welcome to Lokah! Sign in to continue.");
         setIsSignUp(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back to Lokah.");
         navigate("/");
@@ -65,153 +51,119 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 -z-10">
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-accent/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+    <div className="relative flex flex-col items-center justify-center h-screen bg-[#0B0C10] overflow-hidden font-[Inter]">
+      {/* Animated Gradient Background */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A]"
+        animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+        style={{ backgroundSize: "200% 200%" }}
+      />
+
+      {/* Starfield */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(30)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-[2px] h-[2px] bg-white/40 rounded-full"
+            initial={{
+              opacity: Math.random() * 0.5,
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+            }}
+            animate={{ y: [Math.random() * 100, Math.random() * window.innerHeight], opacity: [0.2, 0.6, 0.2] }}
+            transition={{ duration: 20 + Math.random() * 20, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
       </div>
 
-      {/* Back button */}
-      <MotionWrapper animation="fade" className="absolute top-4 sm:top-6 left-4 sm:left-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/")}
-          className="gap-2"
-          aria-label="Go back to home"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Back</span>
-        </Button>
-      </MotionWrapper>
+      {/* Auth Card */}
+      <motion.div
+        className="relative z-20 w-[90%] sm:w-[420px] rounded-3xl p-8 backdrop-blur-md border border-white/10 shadow-[0_0_25px_rgba(113,208,227,0.2)] bg-[#141E32]/70 before:absolute before:inset-0 before:rounded-3xl before:p-[1px] before:bg-gradient-to-r before:from-[#B693FF]/30 before:to-[#71D0E3]/30 before:blur-[2px] before:-z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+        {/* Logo Wordmark */}
+        <div className="flex justify-center items-center mb-6">
+          <LogoWordmark size={28} />
+        </div>
 
-      <MotionWrapper animation="scale" className="w-full max-w-md">
-        <Card className="p-6 sm:p-8 glass-elevated border-primary/20">
-          <div className="space-y-6">
-            <div className="text-center space-y-3">
-              <Logo variant="mark" size="md" />
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                {isSignUp ? "Begin Your Journey" : "Welcome Back"}
-              </h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                {isSignUp 
-                  ? "Create an account to meet your parallel selves" 
-                  : "Sign in to continue your exploration"
-                }
-              </p>
+        {/* Heading */}
+        <h2 className="text-2xl text-white font-[ClashDisplay] text-center mb-2">
+          {isSignUp ? "Join Lokah" : "Welcome Back"}
+        </h2>
+        <p className="text-sm text-[#A0AEC0] text-center mb-8">
+          {isSignUp ? "Create an account to meet your alternate selves" : "Sign in to continue your exploration."}
+        </p>
+
+        {/* Form */}
+        <form className="space-y-4" onSubmit={handleAuth}>
+          {isSignUp && (
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm text-[#F5F7FA]">Name</label>
+              <input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-xl bg-[#1B2436]/70 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#71D0E3]/40 transition"
+              />
             </div>
+          )}
 
-            <form onSubmit={handleAuth} className="space-y-4">
-              {isSignUp && (
-                <motion.div 
-                  className="space-y-2"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required={isSignUp}
-                    className="glass-input"
-                  />
-                </motion.div>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  className="glass-input"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                  minLength={6}
-                  className="glass-input"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full gradient-primary text-white hover:opacity-90 transition-opacity"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isSignUp ? "Creating account..." : "Signing in..."}
-                  </>
-                ) : (
-                  isSignUp ? "Create Account" : "Sign In"
-                )}
-              </Button>
-            </form>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or</span>
-              </div>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="w-full"
-            >
-              {isSignUp 
-                ? "Already have an account? Sign in" 
-                : "Don't have an account? Sign up"
-              }
-            </Button>
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm text-[#F5F7FA]">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              className="w-full px-4 py-3 rounded-xl bg-[#1B2436]/70 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#71D0E3]/40 transition"
+            />
           </div>
-        </Card>
-      </MotionWrapper>
+
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm text-[#F5F7FA]">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete={isSignUp ? "new-password" : "current-password"}
+              minLength={6}
+              className="w-full px-4 py-3 rounded-xl bg-[#1B2436]/70 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#71D0E3]/40 transition"
+            />
+          </div>
+
+          <GlassButton type="submit" label={loading ? (isSignUp ? "Creating..." : "Signing in...") : (isSignUp ? "Create Account" : "Sign In")} disabled={loading} />
+        </form>
+
+        {/* Divider */}
+        <div className="my-6 text-center text-sm text-[#A0AEC0]">or</div>
+
+        {/* Secondary Actions */}
+        <div className="text-center text-sm text-[#A6CFFF]">
+          {isSignUp ? "Already have an account? " : "Don’t have an account? "}
+          <button
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-transparent bg-clip-text bg-gradient-to-r from-[#B693FF] to-[#71D0E3] hover:underline"
+          >
+            {isSignUp ? "Sign In" : "Sign Up"}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Radial Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(113,208,227,0.15)_0%,transparent_80%)] blur-3xl" />
     </div>
   );
 };

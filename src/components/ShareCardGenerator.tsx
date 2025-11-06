@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Download, Share2, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Logo } from "@/components/Logo";
+import Logo from "@/components/Logo";
 import { toast } from "sonner";
 
 interface ShareCardGeneratorProps {
@@ -23,7 +23,7 @@ const SHARE_SIZES = {
 export function ShareCardGenerator({ 
   content, 
   emotionalTone = "reflective",
-  author = "Your Parallel Self"
+  author = "Your Alternate Self"
 }: ShareCardGeneratorProps) {
   const [selectedSize, setSelectedSize] = useState<ShareSize>("instagram");
   const cardRef = useRef<HTMLDivElement>(null);
@@ -100,8 +100,8 @@ export function ShareCardGenerator({
 
           {/* Logo watermark */}
           <div className="relative z-10 flex justify-between items-end">
-            <Logo variant="horizontal" size="sm" animated={false} />
-            <p className="text-white/60 text-sm">ParallelSelf.app</p>
+            <Logo variant="symbol" size={32} animated={false} />
+            <p className="text-white/60 text-sm">Lokah.app</p>
           </div>
         </Card>
       </motion.div>

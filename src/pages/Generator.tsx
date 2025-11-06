@@ -70,10 +70,10 @@ const Generator = () => {
 
       if (error) throw error;
 
-      toast.success("Your parallel self has been created!");
+  toast.success("Your Alternate Self has been created!");
       navigate("/chat", { state: { alternateSelfId: data.id, userId: user.id } });
     } catch (error: any) {
-      toast.error(error.message || "Failed to generate parallel self");
+  toast.error(error.message || "Failed to generate Alternate Self");
     } finally {
       setIsGenerating(false);
     }
@@ -88,7 +88,9 @@ const Generator = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A] animate-[lokahGradientShift_50s_linear_infinite] bg-[length:200%_200%]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(113,208,227,0.12)_0%,transparent_80%)] blur-3xl" />
       <div className="w-full max-w-3xl space-y-8 animate-fade-up">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -98,7 +100,7 @@ const Generator = () => {
           <span className="gradient-text">Step Through the Mirror</span>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             Select the axis where your life could have taken a different turn. 
-            Your parallel self will emerge from this choice.
+            Your Alternate Self will emerge from this choice.
           </p>
         </div>
 
@@ -137,15 +139,15 @@ const Generator = () => {
             disabled={!selectedAxis || isGenerating}
             className="gradient-primary text-white shadow-card hover:shadow-lg transition-all duration-300 hover:scale-105 px-8 py-6 rounded-full"
           >
-            {isGenerating ? (
+      {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Creating Your Parallel Self...
+        Creating Your Alternate Self...
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-5 w-5" />
-                Create My Parallel Self
+        Create My Alternate Self
               </>
             )}
           </Button>

@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -19,7 +21,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a memory extraction assistant. Analyze the following message and determine if it contains a meaningful quote or emotional moment worth saving.
+  const systemPrompt = `You are a memory extraction assistant. Analyze the following message and determine if it contains a meaningful quote or emotional moment worth saving.
 
 If yes, extract:
 1. The specific quote or memorable line (exact words, 1-3 sentences max)
@@ -42,10 +44,13 @@ Format as JSON:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
+          { role: "system", content: LOKAH_SYSTEM_PROMPT },
           { role: "system", content: systemPrompt },
           { role: "user", content: `Extract memory from: ${messageContent}` }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        temperature: 0.35,
+        max_tokens: 250
       }),
     });
 

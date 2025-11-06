@@ -10,7 +10,7 @@ interface ShareCardProps {
   author?: string;
 }
 
-export const ShareCard = ({ quote, author = "Your Parallel Self" }: ShareCardProps) => {
+export const ShareCard = ({ quote, author = "Your Alternate Self" }: ShareCardProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateShareImage = async () => {
@@ -69,7 +69,7 @@ export const ShareCard = ({ quote, author = "Your Parallel Self" }: ShareCardPro
       // Watermark
       ctx.font = "24px Inter, sans-serif";
       ctx.fillStyle = "#9CA3AF";
-      ctx.fillText("ParallelSelf", canvas.width / 2, canvas.height - 40);
+      ctx.fillText("Lokah", canvas.width / 2, canvas.height - 40);
 
       // Convert to blob and download
       canvas.toBlob((blob) => {
@@ -78,7 +78,7 @@ export const ShareCard = ({ quote, author = "Your Parallel Self" }: ShareCardPro
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "parallel-self-wisdom.png";
+  a.download = "lokah-alternate-self-wisdom.png";
         a.click();
         URL.revokeObjectURL(url);
         
@@ -94,7 +94,7 @@ export const ShareCard = ({ quote, author = "Your Parallel Self" }: ShareCardPro
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(`"${quote}"\n— ${author}\n\nParallelSelf`);
+    navigator.clipboard.writeText(`"${quote}"\n— ${author}\n\nLokah`);
     toast.success("Quote copied to clipboard!");
   };
 

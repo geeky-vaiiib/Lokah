@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import ProfileCard from "@/components/ProfileCard";
 import { MemorySnippetBadge } from "@/components/MemorySnippetBadge";
 import { ReflectionCard } from "@/components/ReflectionCard";
+import { analyzeSentiment, getResponseTone } from "@/lib/sentimentAnalysis";
+import { motion } from "framer-motion";
+import LogoWordmark from "@/components/LogoWordmark";
 
 interface Message {
   role: "user" | "assistant";
@@ -34,6 +37,7 @@ const Chat = () => {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<string>("exploratory");
   const [isLoading, setIsLoading] = useState(false);
   const [alternateSelf, setAlternateSelf] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
@@ -41,6 +45,7 @@ const Chat = () => {
   const [reflection, setReflection] = useState<Reflection | null>(null);
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [isGeneratingReflection, setIsGeneratingReflection] = useState(false);
+  const [currentSentiment, setCurrentSentiment] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,6 +105,16 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Analyze sentiment of user input for dynamic UI effects
+  useEffect(() => {
+    if (input.trim()) {
+      const sentiment = analyzeSentiment(input);
+      setCurrentSentiment(sentiment);
+    } else {
+      setCurrentSentiment(null);
+    }
+  }, [input]);
+
   const handleSend = async () => {
     if (!input.trim() || !conversationId || !alternateSelf) return;
 
@@ -115,12 +130,13 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
+    const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
         body: {
           conversationId,
           messages: updatedMessages,
           alternateSelf,
           userName: user.name,
+      mode,
         },
       });
 
@@ -230,24 +246,38 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="relative min-h-screen p-6 bg-[#0B0C10] overflow-hidden">
+      {/* Brand animated gradient background */}
+      <motion.div
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A]"
+        animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+        style={{ backgroundSize: "200% 200%" }}
+      />
+
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Chat with Your Parallel Self</h1>
-          <div className="flex gap-2">
+  {/* Header with wordmark */}
+        <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div className="flex items-center justify-center md:justify-start">
+            <LogoWordmark size={22} />
+          </div>
+          <div className="flex gap-2 justify-center md:justify-end">
             <Button
               variant="outline"
               onClick={handleGenerateReflection}
               disabled={isGeneratingReflection || messages.length < 2}
-              className="gap-2"
+              className="gap-2 border-white/15 bg-[#13213A]/40 text-white hover:bg-[#13213A]/60"
             >
               <Sparkles className="h-4 w-4" />
               {isGeneratingReflection ? "Reflecting..." : "Save & Reflect"}
             </Button>
-            <Button variant="outline" onClick={() => navigate("/saved")} className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/saved")}
+              className="gap-2 border-white/15 bg-[#13213A]/40 text-white hover:bg-[#13213A]/60"
+            >
               <Home className="h-4 w-4" />
-              My Parallel Selves
+              My Alternate Selves
             </Button>
           </div>
         </div>
@@ -261,12 +291,12 @@ const Chat = () => {
 
           {/* Chat area */}
           <div className="lg:col-span-2">
-            <Card className="p-6 shadow-card border-primary/20 h-[600px] flex flex-col">
+            <Card className="p-6 shadow-[0_0_25px_rgba(113,208,227,0.1)] border-white/10 bg-[#0F1623]/60 backdrop-blur-md h-[600px] flex flex-col">
               {/* Messages */}
               <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                {messages.length === 0 && (
+        {messages.length === 0 && (
                   <div className="text-center text-muted-foreground py-12">
-                    <p className="text-lg mb-2">Start a conversation with your parallel self</p>
+          <p className="text-lg mb-2">Start a conversation with your Alternate Self</p>
                     <p className="text-sm">Ask them about their life, choices, or perspectives</p>
                   </div>
                 )}
@@ -306,7 +336,18 @@ const Chat = () => {
               </div>
 
               {/* Input */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                <div className="hidden sm:block">
+                  <select
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value)}
+                    className="px-3 py-2 rounded-md bg-muted text-foreground text-sm"
+                  >
+                    <option value="exploratory">Exploratory</option>
+                    <option value="therapy">Therapy</option>
+                    <option value="concise">Concise</option>
+                  </select>
+                </div>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -314,12 +355,20 @@ const Chat = () => {
                   placeholder="Type your message..."
                   disabled={isLoading}
                   className="flex-1"
+                  style={{
+                    boxShadow: currentSentiment ? `0 0 20px ${currentSentiment.colorTone}40` : undefined,
+                    borderColor: currentSentiment ? currentSentiment.colorTone : undefined,
+                  }}
                 />
                 <Button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   className="gradient-primary text-white"
                   size="icon"
+                  style={{
+                    boxShadow: currentSentiment ? `0 0 20px ${currentSentiment.colorTone}60` : undefined,
+                    filter: currentSentiment ? `brightness(${currentSentiment.emotion === 'positive' ? '1.2' : currentSentiment.emotion === 'negative' ? '0.8' : '1'})` : undefined,
+                  }}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -328,6 +377,9 @@ const Chat = () => {
           </div>
         </div>
       </div>
+
+      {/* Subtle radial glow */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(113,208,227,0.08)_0%,transparent_80%)]" />
 
       {/* Reflection Modal */}
       <Dialog open={showReflectionModal} onOpenChange={setShowReflectionModal}>

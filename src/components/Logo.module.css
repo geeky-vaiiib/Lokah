@@ -1,0 +1,22 @@
+.wordmark {
+  display: block;
+  max-width: 260px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* symbol has a subtle hover glow; animation respects user preference */
+.symbol {
+  display: block;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .wordmark { max-width: 180px; }
+  .symbol { width: 36px; height: 36px; }
+}
+
+/* prevent heavy animations for users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .symbol { animation: none !important; }
+}

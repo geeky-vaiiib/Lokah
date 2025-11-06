@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -19,7 +21,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a reflection assistant analyzing a conversation between someone and their alternate self from a parallel reality.
+  const systemPrompt = `You are a reflection assistant analyzing a conversation between someone and their alternate self from a parallel reality.
 
 The alternate self's context:
 - Divergence axis: ${alternateSelfData.axis}
@@ -38,7 +40,17 @@ Format your response as JSON:
   "emotional_tone": "string"
 }`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const contextBlob = {
+      task: 'reflection_summary',
+      parallel_self: {
+        axis: alternateSelfData.axis,
+        backstory: alternateSelfData.backstory,
+        divergence_summary: alternateSelfData.divergence_summary,
+      },
+      conversation_history: messages.slice(-10)
+    };
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -47,10 +59,13 @@ Format your response as JSON:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Analyze this conversation and generate a reflection:\n\n${JSON.stringify(messages.slice(-10))}` }
+      { role: "system", content: LOKAH_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
+          { role: "user", content: `Context:\n${JSON.stringify(contextBlob, null, 2)}\n\nAnalyze this conversation and generate a reflection JSON.` }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        temperature: 0.4,
+        max_tokens: 300
       }),
     });
 
