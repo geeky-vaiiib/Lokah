@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Download, Share2, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Card } from "@/components/ui/card";
 import Logo from "@/components/Logo";
 import { toast } from "sonner";
@@ -51,18 +52,13 @@ export function ShareCardGenerator({
       {/* Size selector */}
       <div className="flex gap-2 justify-center flex-wrap">
         {(Object.keys(SHARE_SIZES) as ShareSize[]).map((size) => (
-          <Button
-            key={size}
-            variant={selectedSize === size ? "default" : "outline"}
-            onClick={() => setSelectedSize(size)}
-            size="sm"
-            className="gap-2"
-          >
-            {size === "instagram" && <Instagram className="h-4 w-4" />}
-            {size === "twitter" && <Twitter className="h-4 w-4" />}
-            {size === "linkedin" && <Linkedin className="h-4 w-4" />}
-            {SHARE_SIZES[size].label}
-          </Button>
+            <GlassButton
+              key={size}
+              variant={selectedSize === size ? "primary" : "secondary"}
+              onClick={() => setSelectedSize(size)}
+              label={SHARE_SIZES[size].label}
+              className="gap-2 min-w-[120px]"
+            />
         ))}
       </div>
 
@@ -108,21 +104,18 @@ export function ShareCardGenerator({
 
       {/* Action buttons */}
       <div className="flex gap-3 justify-center flex-wrap">
-        <Button
-          onClick={downloadCard}
-          className="gap-2"
-          variant="outline"
-        >
-          <Download className="h-4 w-4" />
-          Download
-        </Button>
-        <Button
-          onClick={() => shareToSocial(selectedSize)}
-          className="gap-2"
-        >
-          <Share2 className="h-4 w-4" />
-          Share
-        </Button>
+  <GlassButton
+            onClick={downloadCard}
+            label="Download"
+            variant="secondary"
+            className="gap-2"
+          />
+  <GlassButton
+            onClick={() => shareToSocial(selectedSize)}
+            label="Share"
+            variant="primary"
+            className="gap-2"
+          />
       </div>
     </div>
   );

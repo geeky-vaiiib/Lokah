@@ -1,6 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
@@ -11,20 +11,16 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
+
+  const next = theme === "dark" ? "light" : "dark";
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="transition-smooth hover:bg-primary/10"
-    >
-      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+  <GlassButton
+      variant="secondary"
+      onClick={() => setTheme(next)}
+      className="relative gap-2"
+      label={next === "dark" ? "Dark Mode" : "Light Mode"}
+    />
   );
 }

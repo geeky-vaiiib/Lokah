@@ -1,8 +1,13 @@
-// @ts-nocheck
+// deno-lint-ignore-file
+// Minimal Deno env declaration for local TS checks
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare const Deno: { env: { get(name: string): string | undefined } };
+// @ts-expect-error - Deno remote module import for local TS
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const AI_API_KEY = Deno.env.get("LOKAH_AI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
+const AI_GATEWAY_URL = Deno.env.get('AI_GATEWAY_URL') || 'https://api.openai.com/v1/chat/completions';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,10 +20,10 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, alternateSelfData } = await req.json();
+  const { messages, alternateSelfData }: { messages: Array<{ role: string; content: string; timestamp?: string }>; alternateSelfData: { axis: string; divergence_summary: string; backstory: string } } = await req.json();
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!AI_API_KEY) {
+      throw new Error("AI API key is not configured");
     }
 
   const systemPrompt = `You are a reflection assistant analyzing a conversation between someone and their alternate self from a parallel reality.
@@ -50,10 +55,10 @@ Format your response as JSON:
       conversation_history: messages.slice(-10)
     };
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const response = await fetch(AI_GATEWAY_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -93,7 +98,7 @@ Format your response as JSON:
     return new Response(JSON.stringify({ reflection }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in generate-reflection:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),

@@ -418,60 +418,7 @@ h1, h2, h3 {
     vertical-align: middle;
   }
 
-  /* Shimmer effect for CTA button */
-  .shimmer-effect {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  /* Primary Button styling */
-  .btn-primary {
-    background: linear-gradient(90deg,#F3E9B0,#6AE7E6);
-    border-radius: 9999px;
-    padding: 18px 44px;
-    font-family: Inter, sans-serif;
-    font-weight: 600;
-    box-shadow: 0 10px 30px rgba(106,231,230,0.08), inset 0 -4px 8px rgba(0,0,0,0.15);
-    color: #072224;
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 40px rgba(6,158,163,0.09);
-  }
-
-  /* CTA Button styling (legacy) */
-  .cta-button {
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-
-  /* Floating particles around button */
-  .floating-particles::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: radial-gradient(circle at 20% 20%, rgba(185, 154, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(106, 209, 227, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 60% 30%, rgba(234, 219, 200, 0.1) 0%, transparent 50%);
-    border-radius: 50%;
-    animation: float-particles 4s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  @keyframes float-particles {
-    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
-    50% { transform: scale(1.1) rotate(180deg); opacity: 0.6; }
-  }
+  /* Removed legacy shimmer/particles/button classes to avoid layout shift and conflicts with new Tailwind-based Button. */
 
   /* Lokah brand tokens */
   :root {

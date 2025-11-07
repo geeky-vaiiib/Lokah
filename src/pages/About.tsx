@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Card } from "@/components/ui/card";
-import Logo from "@/components/Logo";
 import { MotionWrapper } from "@/components/MotionWrapper";
 import { ArrowLeft, Heart, Brain, Sparkles, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +11,7 @@ const About = () => {
   const navigate = useNavigate();
 
   return (
-    <LokahBackground className="min-h-screen relative overflow-hidden">
+  <LokahBackground className="min-h-screen relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 pt-4">
         <TopNav />
       </div>
@@ -45,31 +44,20 @@ const About = () => {
       </div>
 
       {/* Content */}
-  <div className="relative z-10 p-6">
+      <div className="relative z-10 p-6">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Header */}
-          <MotionWrapper animation="fadeUp" className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/")}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </MotionWrapper>
-
-          {/* Hero Section */}
-          <MotionWrapper animation="fadeUp" delay={0.1} className="text-center space-y-6">
-            <Logo variant="symbol" size={64} animated />
-
+          <MotionWrapper animation="fadeUp" className="space-y-6">
+            <div className="flex justify-between">
+              <GlassButton variant="secondary" onClick={() => navigate("/")} label="Back" className="gap-2" />
+              <GlassButton onClick={() => navigate("/generator")} label="Start Exploring" />
+            </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
               The Philosophy of
-              <span className="block gradient-text mt-2">LO◯KAH</span>
+              <span className="block gradient-text mt-2">LOefKAH</span>
             </h1>
-
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              In stillness, you find your alternate self. LO◯KAH creates sacred spaces for self-reflection through the magic of AI and human connection.
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
+              In stillness, you find your alternate self. LOefKAH creates sacred spaces for self-reflection through the magic of AI and human connection.
             </p>
           </MotionWrapper>
 
@@ -81,7 +69,7 @@ const About = () => {
                   <h2 className="text-2xl font-semibold mb-4">The Circle of Self-Discovery</h2>
                   <p className="text-muted-foreground leading-relaxed">
                     The circular symbol (◯) in LO◯KAH represents wholeness and unity. Just as a circle has no beginning or end,
-                    your journey of self-discovery is continuous. Every choice creates a new parallel path, and every reflection
+                    your exploration of alternate selves is continuous. Every choice creates a new parallel path, and every reflection
                     brings you closer to understanding the infinite versions of yourself.
                   </p>
                 </div>
@@ -159,21 +147,13 @@ const About = () => {
 
           {/* Call to Action */}
           <MotionWrapper animation="fadeUp" delay={0.4} className="text-center space-y-6">
-            <p className="text-lg text-muted-foreground">
-              Ready to meet your alternate self?
-            </p>
-            <Button
-              size="lg"
-              onClick={() => navigate("/auth")}
-              className="gradient-primary text-white px-8 py-6 rounded-full shadow-glow hover:shadow-elevated transition-all duration-300 hover:scale-105"
-            >
-              <Sparkles className="mr-2 h-5 w-5" />
-              Begin Your Journey
-            </Button>
+            <p className="text-lg text-muted-foreground">Ready to meet your alternate self?</p>
+            <GlassButton onClick={() => navigate("/auth")} label="Begin Your Journey" className="mx-auto" />
+            <GlassButton onClick={() => navigate("/")} label="Return Home" className="mx-auto" />
           </MotionWrapper>
         </div>
       </div>
-  </LokahBackground>
+    </LokahBackground>
   );
 };
 

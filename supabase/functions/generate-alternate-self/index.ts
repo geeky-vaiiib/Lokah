@@ -1,4 +1,8 @@
-// @ts-nocheck
+// deno-lint-ignore-file
+// Minimal Deno global for local TS
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare const Deno: { env: { get(name: string): string | undefined } };
+// @ts-expect-error - remote Deno std module import for local TS
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
 
@@ -13,17 +17,18 @@ serve(async (req) => {
   }
 
   try {
-    const { userId, axis, userData } = await req.json();
+  const { userId, axis, userData }: { userId: string; axis: string; userData: { name: string; values: string[]; major_choices: string[]; unchosen_path: string } } = await req.json();
     console.log('Generating alternate self for user:', userId, 'axis:', axis);
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    const AI_API_KEY = Deno.env.get('LOKAH_AI_API_KEY') || Deno.env.get('OPENAI_API_KEY');
+    const AI_GATEWAY_URL = Deno.env.get('AI_GATEWAY_URL') || 'https://api.openai.com/v1/chat/completions';
+    if (!AI_API_KEY) {
+      throw new Error('AI API key not configured');
     }
 
   // Create prompt for generating alternate backstory using shared base prompt
   const lokahBasePrompt = LOKAH_SYSTEM_PROMPT;
-    const prompt = `You are creating a parallel self — an alternate version of ${userData.name} from another timeline.
+  const prompt = `You are creating an alternate version of ${userData.name} from another timeline.
 Think, talk, and feel like a real human version of them — not like a narrator or writer.
 
 Your tone is conversational, natural, and introspective — like sharing a story with an old friend.
@@ -63,10 +68,10 @@ Output in JSON format:
   "different_traits": ["...", "...", "..."]
 }`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+    'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -105,7 +110,8 @@ Output in JSON format:
     }
 
     // Import Supabase client
-    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+  // @ts-expect-error - remote module in Deno environment for local TS
+  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -134,9 +140,10 @@ Output in JSON format:
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in generate-alternate-self:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

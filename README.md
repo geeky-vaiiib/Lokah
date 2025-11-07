@@ -1,26 +1,12 @@
-# Welcome to your Lovable project
+# LOKAH — Many Worlds, One You
 
-## Project info
+Lokah is an emotionally intelligent UI that lets you explore alternate versions of yourself and reflect through concise, human-feeling AI conversation.
 
-**URL**: https://lovable.dev/projects/d78fd746-47ec-4d2a-ad01-d4a57a455044
+## Getting Started (Local)
 
-## How can I edit this code?
+Requires Node.js & npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)).
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/d78fd746-47ec-4d2a-ad01-d4a57a455044) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -36,19 +22,7 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+You can also edit directly in GitHub or use Codespaces if preferred.
 
 ## What technologies are used for this project?
 
@@ -60,14 +34,29 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/d78fd746-47ec-4d2a-ad01-d4a57a455044) and click on Share -> Publish.
+Build and deploy the `dist` folder to any static host (Vercel, Netlify, Cloudflare Pages).
 
-## Can I connect a custom domain to my Lovable project?
+## Custom Domain
 
-Yes, you can!
+Point your domain to the deployed site per provider docs.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Tech Stack
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Vite + React + TypeScript
+- Tailwind CSS + shadcn-ui
+- Framer Motion
+- Supabase Edge Functions
+
+## Brand Tokens
+
+Primary Gradient: `#B693FF → #71D0E3`
+Secondary Gradient: `#FAD6E7 → #A1E0C0`
+Background: `#0B0C10 / #0E1A2E / #13213A`
+Text: Primary `#FFFFFF`, Secondary `#BFC6D0`
+Accent Glow: `#D1A9FF`
+
+## License
+
+Proprietary – Do not redistribute without permission.

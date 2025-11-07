@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import LogoWordmark from "@/components/LogoWordmark";
 import { useNavigate } from "react-router-dom";
 import React from "react";
@@ -9,10 +9,8 @@ export const TopNav: React.FC<{ className?: string }> = ({ className }) => {
     <div className={`w-full flex items-center justify-between py-4 ${className ?? ""}`}>
   <LogoWordmark size={20} />
       <div className="flex items-center gap-2">
-        <Button variant="secondary" onClick={() => navigate("/saved")}>My Selves</Button>
-        <Button variant="secondary" onClick={() => navigate("/generator")} className="px-6 py-2">
-          + Create New
-        </Button>
+  <GlassButton variant="secondary" onClick={() => navigate("/saved")} label="My Selves" />
+  <GlassButton variant="secondary" onClick={() => navigate("/generator")} className="px-6 py-2" label="+ Create New" />
       </div>
     </div>
   );

@@ -8,8 +8,8 @@ interface ProfileCardProps {
     axis: string;
     divergence_summary: string;
     backstory: string;
-    shared_traits: string[];
-    different_traits: string[];
+    shared_traits?: string[];
+    different_traits?: string[];
   };
   userName: string;
 }

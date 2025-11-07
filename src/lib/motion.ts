@@ -10,7 +10,7 @@ export const motionPresets = {
   },
   portalRotation: {
     animate: { rotate: 360 },
-  transition: { repeat: Infinity as any, duration: 10, ease: [0.0, 0.0, 1.0, 1.0] as any },
+  transition: { repeat: Infinity, duration: 10, ease: "linear" },
   },
   buttonHover: {
     whileHover: { scale: 1.05 },
@@ -21,12 +21,12 @@ export const motionPresets = {
 export const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease: "easeOut" as any },
+  transition: { duration: 0.8, ease: "easeOut" },
 };
 
 export const slowFloat = {
   animate: { y: [0, -10, 0] },
-  transition: { duration: 6, repeat: Infinity, ease: "easeInOut" as any },
+  transition: { duration: 6, repeat: Infinity, ease: "easeInOut" },
 };
 
 export type ToneTag = "calm" | "warm" | "reflective" | "inspired" | "practical" | "anxious" | string;

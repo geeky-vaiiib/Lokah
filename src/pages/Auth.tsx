@@ -43,8 +43,9 @@ const Auth = () => {
         toast.success("Welcome back to Lokah.");
         navigate("/");
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || "An error occurred");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,7 +23,14 @@ const Generator = () => {
 
   const [selectedAxis, setSelectedAxis] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  interface UserRecord {
+    id: string;
+    name: string;
+    values?: string[];
+    major_choices?: string[];
+    unchosen_path?: string;
+  }
+  const [user, setUser] = useState<UserRecord | null>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -72,8 +79,9 @@ const Generator = () => {
 
   toast.success("Your Alternate Self has been created!");
       navigate("/chat", { state: { alternateSelfId: data.id, userId: user.id } });
-    } catch (error: any) {
-  toast.error(error.message || "Failed to generate Alternate Self");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || "Failed to generate Alternate Self");
     } finally {
       setIsGenerating(false);
     }
@@ -133,24 +141,12 @@ const Generator = () => {
 
         {/* Generate button */}
         <div className="flex justify-center">
-          <Button
-            size="lg"
+          <GlassButton
             onClick={handleGenerate}
             disabled={!selectedAxis || isGenerating}
-            className="gradient-primary text-white shadow-card hover:shadow-lg transition-all duration-300 hover:scale-105 px-8 py-6 rounded-full"
-          >
-      {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Creating Your Alternate Self...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-5 w-5" />
-        Create My Alternate Self
-              </>
-            )}
-          </Button>
+            className="px-8"
+            label={isGenerating ? "Creating Your Alternate Self..." : "Create My Alternate Self"}
+          />
         </div>
       </div>
     </div>

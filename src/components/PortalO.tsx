@@ -1,30 +1,59 @@
 import { motion } from "framer-motion";
+import React from "react";
+import { LOKAH_THEME } from "@/styles/theme";
 
-export function PortalO({ size = 48, strokeWidth = 1.5 }: { size?: number; strokeWidth?: number }) {
+interface PortalOProps {
+  size?: number;
+  strokeWidth?: number;
+  subtle?: boolean; // reduce glow for compact placements
+  className?: string;
+  diagonal?: boolean;
+}
+
+export function PortalO({ size = 48, strokeWidth = 1, subtle = false, className, diagonal = false }: PortalOProps) {
+  const glowOpacity = subtle ? 0.06 : 0.14;
+  const ringStroke = "rgba(255,255,255,0.82)";
+
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      {/* Soft radial glow */}
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(182,147,255,0.15)_0%,transparent_70%)]" />
-      {/* Outer ring */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 14, ease: "linear" as any, repeat: Infinity }}
-        className="absolute inset-0 flex items-center justify-center"
-      >
-        <div
-          className="absolute rounded-full border border-[#71D0E3]/60 shadow-[0_0_20px_rgba(113,208,227,0.25)]"
-          style={{ width: size, height: size }}
+    <motion.div
+      className={`relative inline-flex items-center justify-center ${className || ""}`}
+      style={{ width: size, height: size }}
+      animate={{ rotate: 360 }}
+      transition={{ duration: 28, ease: "linear", repeat: Infinity }}
+    >
+      {/* Glow ring */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: `radial-gradient(circle, rgba(198,184,255,${glowOpacity}) 0%, rgba(129,230,255,0) 60%)`,
+          filter: subtle ? "none" : LOKAH_THEME.glow,
+        }}
+      />
+      {/* SVG O with precise 1px stroke */}
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="relative block">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={(size - 1) / 2}
+          stroke={ringStroke}
+          strokeWidth={strokeWidth}
+          fill="none"
+          style={{ filter: "drop-shadow(0 0 4px rgba(151,255,224,0.3))" }}
         />
-        <div
-          className="absolute inset-x-[48%] bg-[#71D0E3]/70 blur-[0.5px]"
-          style={{
-            height: size * 0.8,
-            width: strokeWidth,
-            borderRadius: "1px",
-          }}
-        />
-      </motion.div>
-    </div>
+        {diagonal && (
+          <line
+            x1={size * 0.28}
+            y1={size * 0.18}
+            x2={size * 0.72}
+            y2={size * 0.82}
+            stroke="rgba(255,255,255,0.85)"
+            strokeWidth={strokeWidth * 0.85}
+            strokeLinecap="round"
+            style={{ filter: "drop-shadow(0 0 3px rgba(129,230,255,0.35))" }}
+          />
+        )}
+      </svg>
+    </motion.div>
   );
 }
 

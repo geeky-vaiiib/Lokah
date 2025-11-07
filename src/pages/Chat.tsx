@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,15 +13,35 @@ import { ReflectionCard } from "@/components/ReflectionCard";
 import { analyzeSentiment, getResponseTone } from "@/lib/sentimentAnalysis";
 import { motion } from "framer-motion";
 import LogoWordmark from "@/components/LogoWordmark";
+import MoodBackground from "@/components/MoodBackground";
+
+interface MemorySnippet {
+  content: string;
+  emotional_tone: string;
+}
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
-  memorySnippet?: {
-    content: string;
-    emotional_tone: string;
-  };
+  memorySnippet?: MemorySnippet;
+}
+
+interface AlternateSelfRecord {
+  id: string;
+  axis: string;
+  divergence_summary: string;
+  backstory: string;
+  shared_traits?: string[];
+  different_traits?: string[];
+  created_at?: string;
+}
+
+interface UserRecord {
+  id: string;
+  name: string;
+  email?: string;
+  created_at?: string;
 }
 
 interface Reflection {
@@ -39,14 +59,15 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<string>("exploratory");
   const [isLoading, setIsLoading] = useState(false);
-  const [alternateSelf, setAlternateSelf] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const [alternateSelf, setAlternateSelf] = useState<AlternateSelfRecord | null>(null);
+  const [user, setUser] = useState<UserRecord | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [reflection, setReflection] = useState<Reflection | null>(null);
   const [showReflectionModal, setShowReflectionModal] = useState(false);
   const [isGeneratingReflection, setIsGeneratingReflection] = useState(false);
-  const [currentSentiment, setCurrentSentiment] = useState<any>(null);
+  const [currentSentiment, setCurrentSentiment] = useState<ReturnType<typeof analyzeSentiment> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [toneTags, setToneTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (!alternateSelfId || !userId) {
@@ -56,7 +77,7 @@ const Chat = () => {
     }
 
     const loadData = async () => {
-      const [selfResult, userResult] = await Promise.all([
+  const [selfResult, userResult] = await Promise.all([
         supabase.from("alternate_selves").select("*").eq("id", alternateSelfId).single(),
         supabase.from("users").select("*").eq("id", userId).single(),
       ]);
@@ -80,14 +101,27 @@ const Chat = () => {
 
       if (existingConv) {
         setConversationId(existingConv.id);
-        setMessages((existingConv.messages as any) || []);
+        type RawMessage = { role: string; content: string; timestamp: string; memorySnippet?: { content: string; emotional_tone: string } | null };
+        const rawMessages: unknown = existingConv.messages;
+        const loadedMessages: Message[] = Array.isArray(rawMessages)
+          ? (rawMessages as RawMessage[]).map((m) => ({
+              role: m.role === "assistant" ? "assistant" : "user",
+              content: m.content,
+              timestamp: m.timestamp,
+              memorySnippet: m.memorySnippet && m.memorySnippet.content ? {
+                content: m.memorySnippet.content,
+                emotional_tone: m.memorySnippet.emotional_tone,
+              } : undefined,
+            }))
+          : [];
+        setMessages(loadedMessages);
       } else {
         const { data: newConv, error } = await supabase
           .from("conversations")
           .insert({
             user_id: userId,
             alternate_self_id: alternateSelfId,
-            messages: [] as any,
+            messages: [],
           })
           .select()
           .single();
@@ -129,8 +163,8 @@ const Chat = () => {
     setInput("");
     setIsLoading(true);
 
-    try {
-    const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
+  try {
+  const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
         body: {
           conversationId,
           messages: updatedMessages,
@@ -150,26 +184,43 @@ const Chat = () => {
 
       // Extract memory snippet for this message
       try {
-        const { data: memoryData } = await supabase.functions.invoke("extract-memory", {
+  const { data: memoryData } = await supabase.functions.invoke("extract-memory", {
           body: { messageContent: data.reply },
         });
 
         if (memoryData?.memory?.content) {
           assistantMessage.memorySnippet = memoryData.memory;
         }
-      } catch (memoryError) {
-        console.log("Memory extraction skipped:", memoryError);
+      } catch (_memoryError) {
+        console.log("Memory extraction skipped:", _memoryError);
       }
 
       const finalMessages = [...updatedMessages, assistantMessage];
+      if (data?.structured?.tone_tags && Array.isArray(data.structured.tone_tags)) {
+        setToneTags(data.structured.tone_tags as string[]);
+      }
       setMessages(finalMessages);
+
+      // Supabase expects Json serializable structure
+      const jsonMessages = finalMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp,
+        memorySnippet: m.memorySnippet
+          ? {
+              content: m.memorySnippet.content,
+              emotional_tone: m.memorySnippet.emotional_tone,
+            }
+          : null,
+      }));
 
       await supabase
         .from("conversations")
-        .update({ messages: finalMessages as any })
+        .update({ messages: jsonMessages })
         .eq("id", conversationId);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send message");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || "Failed to send message");
     } finally {
       setIsLoading(false);
     }
@@ -230,8 +281,9 @@ const Chat = () => {
       setReflection(reflectionData.reflection);
       setShowReflectionModal(true);
       toast.success("✨ Reflection generated");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to generate reflection");
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast.error(err?.message || "Failed to generate reflection");
     } finally {
       setIsGeneratingReflection(false);
     }
@@ -239,14 +291,17 @@ const Chat = () => {
 
   if (!alternateSelf || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center" aria-busy="true" aria-live="polite">
+        <div role="status" aria-label="Loading">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="relative min-h-screen p-6 bg-[#0B0C10] overflow-hidden">
+      <MoodBackground toneTags={toneTags} />
       {/* Brand animated gradient background */}
       <motion.div
         className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A]"
@@ -262,23 +317,19 @@ const Chat = () => {
             <LogoWordmark size={22} />
           </div>
           <div className="flex gap-2 justify-center md:justify-end">
-            <Button
-              variant="outline"
+            <GlassButton
+              variant="secondary"
               onClick={handleGenerateReflection}
               disabled={isGeneratingReflection || messages.length < 2}
-              className="gap-2 border-white/15 bg-[#13213A]/40 text-white hover:bg-[#13213A]/60"
-            >
-              <Sparkles className="h-4 w-4" />
-              {isGeneratingReflection ? "Reflecting..." : "Save & Reflect"}
-            </Button>
-            <Button
-              variant="outline"
+              label={isGeneratingReflection ? "Reflecting..." : "Save & Reflect"}
+              className="gap-2"
+            />
+            <GlassButton
+              variant="secondary"
               onClick={() => navigate("/saved")}
-              className="gap-2 border-white/15 bg-[#13213A]/40 text-white hover:bg-[#13213A]/60"
-            >
-              <Home className="h-4 w-4" />
-              My Alternate Selves
-            </Button>
+              label="My Selves"
+              className="gap-2"
+            />
           </div>
         </div>
 
@@ -360,18 +411,12 @@ const Chat = () => {
                     borderColor: currentSentiment ? currentSentiment.colorTone : undefined,
                   }}
                 />
-                <Button
+                <GlassButton
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
-                  className="gradient-primary text-white"
-                  size="icon"
-                  style={{
-                    boxShadow: currentSentiment ? `0 0 20px ${currentSentiment.colorTone}60` : undefined,
-                    filter: currentSentiment ? `brightness(${currentSentiment.emotion === 'positive' ? '1.2' : currentSentiment.emotion === 'negative' ? '0.8' : '1'})` : undefined,
-                  }}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                  label={isLoading ? "..." : "Send"}
+                  className="min-w-[96px]"
+                />
               </div>
             </Card>
           </div>
@@ -385,15 +430,15 @@ const Chat = () => {
       <Dialog open={showReflectionModal} onOpenChange={setShowReflectionModal}>
         <DialogContent className="max-w-2xl glass-card border-primary/30">
           <DialogHeader>
-            <DialogTitle className="text-2xl gradient-text">Your Journey's Reflection</DialogTitle>
+            <DialogTitle className="text-2xl gradient-text">Reflections</DialogTitle>
           </DialogHeader>
           {reflection && <ReflectionCard reflection={reflection} />}
-          <Button
+          <GlassButton
             onClick={() => setShowReflectionModal(false)}
-            className="gradient-primary text-white mt-4"
-          >
-            Return to Mirror
-          </Button>
+            label="Return"
+            variant="secondary"
+            className="mt-4"
+          />
         </DialogContent>
       </Dialog>
     </div>

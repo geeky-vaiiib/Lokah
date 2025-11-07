@@ -62,10 +62,7 @@ export default function Welcome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4, duration: 1 }}
       >
-        <GlassButton
-          label="Begin Your Journey"
-          onClick={() => (window.location.href = "/onboarding")}
-        />
+  <GlassButton label="Begin Your Journey" variant="primary" onClick={() => (window.location.href = "/onboarding")} />
       </motion.div>
 
       {/* Vignette & Bloom */}

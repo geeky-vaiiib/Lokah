@@ -1,8 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
+type TimelineSelf = {
+  id: string;
+  axis?: keyof typeof axisColors | string;
+  divergence_summary?: string;
+  created_at?: string;
+};
+
 interface TimelineProps {
-  selves: any[];
+  selves: TimelineSelf[];
   userId: string;
 }
 

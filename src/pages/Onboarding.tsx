@@ -147,11 +147,12 @@ const Onboarding = () => {
 
       if (error) throw error;
 
-      toast.success("Your journey begins now");
+  toast.success("You’re all set — let’s start exploring.");
       navigate("/generator", { state: { userId: data.id } });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Onboarding error:", error);
-      toast.error(error.message || "Failed to complete onboarding");
+      const message = error instanceof Error ? error.message : "Failed to complete onboarding";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { GlassButton } from "@/components/GlassButton";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, MessageCircle, Loader2, LogOut } from "lucide-react";
@@ -13,7 +13,9 @@ import logo from "@/assets/logo.png";
 const SavedSelves = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const [selves, setSelves] = useState<any[]>([]);
+  type Conversation = { id: string; messages?: unknown };
+  type AltSelf = { id: string; axis?: string; divergence_summary?: string; conversations?: Conversation[] };
+  const [selves, setSelves] = useState<AltSelf[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -76,17 +78,8 @@ const SavedSelves = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button
-              onClick={() => navigate("/generator", { state: { userId } })}
-              className="gradient-primary text-white gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Create New
-            </Button>
-            <Button variant="outline" onClick={signOut} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+            <GlassButton onClick={() => navigate("/generator", { state: { userId } })} className="gap-2" label="Create New" />
+            <GlassButton variant="secondary" onClick={signOut} className="gap-2" label="Sign Out" />
           </div>
         </div>
 
@@ -99,12 +92,7 @@ const SavedSelves = () => {
             <p className="text-muted-foreground/80 mb-6">
               Create your first Alternate Self and explore the roads not taken
             </p>
-            <Button
-              onClick={() => navigate("/generator", { state: { userId } })}
-              className="gradient-primary text-white"
-            >
-              Step Through the Mirror
-            </Button>
+            <GlassButton onClick={() => navigate("/generator", { state: { userId } })} label="Step Through the Mirror" />
           </Card>
         ) : (
           <Tabs defaultValue="gallery" className="w-full">
@@ -120,8 +108,9 @@ const SavedSelves = () => {
             <TabsContent value="gallery">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {selves.map((self) => {
-              const lastMessage = self.conversations?.[0]?.messages?.slice(-1)[0];
-              const messageCount = self.conversations?.[0]?.messages?.length || 0;
+              const msgs = (self.conversations?.[0]?.messages as unknown) as Array<{ role: "user" | "assistant"; content: string }> | undefined;
+              const lastMessage = Array.isArray(msgs) ? msgs.slice(-1)[0] : undefined;
+              const messageCount = Array.isArray(msgs) ? msgs.length : 0;
 
               return (
                 <Card
@@ -152,10 +141,7 @@ const SavedSelves = () => {
                       </div>
                     )}
 
-                    <Button variant="outline" className="w-full gap-2">
-                      <MessageCircle className="h-4 w-4" />
-                      {messageCount > 0 ? "Continue Chat" : "Start Conversation"}
-                    </Button>
+                    <GlassButton variant="secondary" className="w-full gap-2" label={messageCount > 0 ? "Continue Chat" : "Start Conversation"} />
                   </div>
                 </Card>
               );
