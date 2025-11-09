@@ -1,8 +1,10 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "Lokah",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Many Worlds, One You.",
+  "author": "geeky-vaiiib",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -21,10 +21,8 @@ export const LogoWordmark: React.FC<Props> = ({ size = 28, oScale = 1, className
   const oSize = Math.round(letterSize * 0.88); // slightly smaller for balance
   return (
     <div
-      className={`logo-container relative flex items-baseline justify-center gap-2 text-white font-[ClashDisplay] uppercase tracking-widest ${
-        className ?? ""
-      }`}
-      style={{ lineHeight: 1 }}
+      className={`logo-container relative flex items-baseline justify-center gap-2 font-[ClashDisplay] uppercase ${className ?? ""}`}
+      style={{ lineHeight: 1, letterSpacing: '0.1em', background: variant === 'hero' ? LOKAH_THEME.gradient : undefined, WebkitBackgroundClip: variant === 'hero' ? 'text' : undefined, color: variant === 'hero' ? 'transparent' : '#FFFFFF' }}
     >
       <span style={{ fontSize: letterSize }}>L</span>
       <div className="relative flex items-center justify-center" style={{ height: letterSize }}>

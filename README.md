@@ -1,62 +1,43 @@
-# LOKAH — Many Worlds, One You
+# Lokah
 
-Lokah is an emotionally intelligent UI that lets you explore alternate versions of yourself and reflect through concise, human-feeling AI conversation.
+Created and maintained by **geeky-vaiiib**  
+Many Worlds, One You.
 
-## Getting Started (Local)
+Lokah lets you talk to human-feeling alternate versions of yourself: short, grounded, reflective chats that explore unchosen paths without drifting into therapy-speak or poetic abstraction.
 
-Requires Node.js & npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)).
-
-Steps:
+## Quick Start
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+git clone https://github.com/geeky-vaiiib/Lokah.git
+cd Lokah
+npm ci
 npm run dev
 ```
 
-You can also edit directly in GitHub or use Codespaces if preferred.
+Visit: http://localhost:8080
 
-## What technologies are used for this project?
+## Scripts
+- dev: local development (Vite)
+- build: production bundle
+- test: vitest suite
+- lint: eslint check
 
-This project is built with:
+## Stack
+Vite + React + TypeScript + Tailwind + shadcn-ui + Framer Motion + Supabase Edge Functions
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Design Tokens
+Gradient: #B693FF → #71D0E3 → #97FFE0  
+Background: #0B0C10 / #0E1A2E / #13213A  
+Text: #FFFFFF / Muted #BFC6D0  
+Glow: drop-shadow(0 0 10px rgba(151,255,224,0.3))
 
-## Deployment
-
-Build and deploy the `dist` folder to any static host (Vercel, Netlify, Cloudflare Pages).
-
-## Custom Domain
-
-Point your domain to the deployed site per provider docs.
-
-## Tech Stack
-
-- Vite + React + TypeScript
-- Tailwind CSS + shadcn-ui
-- Framer Motion
-- Supabase Edge Functions
-
-## Brand Tokens
-
-Primary Gradient: `#B693FF → #71D0E3`
-Secondary Gradient: `#FAD6E7 → #A1E0C0`
-Background: `#0B0C10 / #0E1A2E / #13213A`
-Text: Primary `#FFFFFF`, Secondary `#BFC6D0`
-Accent Glow: `#D1A9FF`
+## Production Build
+```sh
+npm run build
+npm run preview
+```
+Deploy the `dist` directory to Vercel / Netlify / Cloudflare Pages.
 
 ## License
+© 2025 geeky-vaiiib. All rights reserved.
 
-Proprietary – Do not redistribute without permission.

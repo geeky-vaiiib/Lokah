@@ -19,14 +19,14 @@ export function PortalO({ size = 48, strokeWidth = 1, subtle = false, className,
       className={`relative inline-flex items-center justify-center ${className || ""}`}
       style={{ width: size, height: size }}
       animate={{ rotate: 360 }}
-      transition={{ duration: 28, ease: "linear", repeat: Infinity }}
+      transition={{ duration: 16, ease: "linear", repeat: Infinity }}
     >
       {/* Glow ring */}
       <div
         className="absolute inset-0 rounded-full"
         style={{
           background: `radial-gradient(circle, rgba(198,184,255,${glowOpacity}) 0%, rgba(129,230,255,0) 60%)`,
-          filter: subtle ? "none" : LOKAH_THEME.glow,
+          filter: subtle ? "none" : 'drop-shadow(0 0 10px rgba(151,255,224,0.4))',
         }}
       />
       {/* SVG O with precise 1px stroke */}

@@ -85,12 +85,12 @@ serve(async (req) => {
   'Authorization': `Bearer ${AI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+    body: JSON.stringify({
   model: 'gpt-4-turbo',
-  temperature: mode === 'exploratory' ? 0.6 : (mode === 'therapy' ? 0.4 : 0.3),
+  temperature: 0.6,
   top_p: 0.9,
-  presence_penalty: 0.3,
-  frequency_penalty: 0.3,
+  presence_penalty: 0.2,
+  frequency_penalty: 0.2,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: JSON.stringify({ context: { ...contextBlob, mode, tone_preference: 'friendly' }, user_message: lastUserMessage }) }
