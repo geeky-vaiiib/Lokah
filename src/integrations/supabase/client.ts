@@ -8,10 +8,16 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+// Basic validation to prevent crash loops with placeholder credentials
+const isPlaceholderUrl = (url: string) => !url || url.includes("xawscxdrwzjzghshudpx") || !url.startsWith("http");
+
+export const isDemoMode = isPlaceholderUrl(SUPABASE_URL);
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+    persistSession: !isDemoMode,
+    autoRefreshToken: !isDemoMode,
+    detectSessionInUrl: !isDemoMode,
   }
 });

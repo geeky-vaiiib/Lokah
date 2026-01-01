@@ -4,15 +4,15 @@ import { GlassButton } from "@/components/GlassButton";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Send, Loader2, Home, Sparkles } from "lucide-react";
+import { Send, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProfileCard from "@/components/ProfileCard";
 import { MemorySnippetBadge } from "@/components/MemorySnippetBadge";
 import { ReflectionCard } from "@/components/ReflectionCard";
-import { analyzeSentiment, getResponseTone } from "@/lib/sentimentAnalysis";
-import { motion } from "framer-motion";
-import LogoWordmark from "@/components/LogoWordmark";
+import { analyzeSentiment } from "@/lib/sentimentAnalysis";
+import { motion, AnimatePresence } from "framer-motion";
+import Logo from "@/components/Logo";
 import MoodBackground from "@/components/MoodBackground";
 
 interface MemorySnippet {
@@ -77,7 +77,7 @@ const Chat = () => {
     }
 
     const loadData = async () => {
-  const [selfResult, userResult] = await Promise.all([
+      const [selfResult, userResult] = await Promise.all([
         supabase.from("alternate_selves").select("*").eq("id", alternateSelfId).single(),
         supabase.from("users").select("*").eq("id", userId).single(),
       ]);
@@ -91,7 +91,6 @@ const Chat = () => {
       setAlternateSelf(selfResult.data);
       setUser(userResult.data);
 
-      // Create or load conversation
       const { data: existingConv } = await supabase
         .from("conversations")
         .select("*")
@@ -105,14 +104,14 @@ const Chat = () => {
         const rawMessages: unknown = existingConv.messages;
         const loadedMessages: Message[] = Array.isArray(rawMessages)
           ? (rawMessages as RawMessage[]).map((m) => ({
-              role: m.role === "assistant" ? "assistant" : "user",
-              content: m.content,
-              timestamp: m.timestamp,
-              memorySnippet: m.memorySnippet && m.memorySnippet.content ? {
-                content: m.memorySnippet.content,
-                emotional_tone: m.memorySnippet.emotional_tone,
-              } : undefined,
-            }))
+            role: m.role === "assistant" ? "assistant" : "user",
+            content: m.content,
+            timestamp: m.timestamp,
+            memorySnippet: m.memorySnippet && m.memorySnippet.content ? {
+              content: m.memorySnippet.content,
+              emotional_tone: m.memorySnippet.emotional_tone,
+            } : undefined,
+          }))
           : [];
         setMessages(loadedMessages);
       } else {
@@ -139,7 +138,6 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Analyze sentiment of user input for dynamic UI effects
   useEffect(() => {
     if (input.trim()) {
       const sentiment = analyzeSentiment(input);
@@ -150,7 +148,7 @@ const Chat = () => {
   }, [input]);
 
   const handleSend = async () => {
-    if (!input.trim() || !conversationId || !alternateSelf) return;
+    if (!input.trim() || !conversationId || !alternateSelf || !user) return;
 
     const userMessage: Message = {
       role: "user",
@@ -163,14 +161,14 @@ const Chat = () => {
     setInput("");
     setIsLoading(true);
 
-  try {
-  const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
+    try {
+      const { data, error } = await supabase.functions.invoke("chat-with-parallel-self", {
         body: {
           conversationId,
           messages: updatedMessages,
           alternateSelf,
           userName: user.name,
-      mode,
+          mode,
         },
       });
 
@@ -182,9 +180,8 @@ const Chat = () => {
         timestamp: new Date().toISOString(),
       };
 
-      // Extract memory snippet for this message
       try {
-  const { data: memoryData } = await supabase.functions.invoke("extract-memory", {
+        const { data: memoryData } = await supabase.functions.invoke("extract-memory", {
           body: { messageContent: data.reply },
         });
 
@@ -201,16 +198,15 @@ const Chat = () => {
       }
       setMessages(finalMessages);
 
-      // Supabase expects Json serializable structure
       const jsonMessages = finalMessages.map((m) => ({
         role: m.role,
         content: m.content,
         timestamp: m.timestamp,
         memorySnippet: m.memorySnippet
           ? {
-              content: m.memorySnippet.content,
-              emotional_tone: m.memorySnippet.emotional_tone,
-            }
+            content: m.memorySnippet.content,
+            emotional_tone: m.memorySnippet.emotional_tone,
+          }
           : null,
       }));
 
@@ -251,7 +247,6 @@ const Chat = () => {
 
       if (reflectionError) throw reflectionError;
 
-      // Save reflection to database
       const { data: authData } = await supabase.auth.getUser();
       if (authData.user) {
         await supabase.from("reflections").insert({
@@ -262,7 +257,6 @@ const Chat = () => {
           insights: reflectionData.reflection.insights,
         });
 
-        // Save memory snippets to database
         const memorySnippets = messages
           .filter((m) => m.role === "assistant" && m.memorySnippet)
           .map((m) => ({
@@ -291,30 +285,45 @@ const Chat = () => {
 
   if (!alternateSelf || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center" aria-busy="true" aria-live="polite">
-        <div role="status" aria-label="Loading">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(220 25% 4%)]" aria-busy="true" aria-live="polite">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-[hsl(35_35%_65%)]" />
+          <span className="text-white/40 text-sm">Connecting to your Alternate Self...</span>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen p-6 bg-[#0B0C10] overflow-hidden">
+    <div className="relative min-h-screen p-4 md:p-6 bg-[hsl(220 25% 4%)] overflow-hidden">
       <MoodBackground toneTags={toneTags} />
-      {/* Brand animated gradient background */}
-      <motion.div
-        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B0C10] via-[#0E1A2E] to-[#13213A]"
-        animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
-        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-        style={{ backgroundSize: "200% 200%" }}
+
+      {/* Gradient Background */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 60% at 20% -20%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 40% at 80% 0%, hsl(35 35% 65% / 0.06) 0%, transparent 50%),
+            hsl(222 47% 3%)
+          `,
+        }}
       />
 
       <div className="max-w-7xl mx-auto">
-  {/* Header with wordmark */}
-        <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        {/* Header */}
+        <motion.div
+          className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="flex items-center justify-center md:justify-start">
-            <LogoWordmark size={22} />
+            <Logo size={22} asLink />
           </div>
           <div className="flex gap-2 justify-center md:justify-end">
             <GlassButton
@@ -322,115 +331,175 @@ const Chat = () => {
               onClick={handleGenerateReflection}
               disabled={isGeneratingReflection || messages.length < 2}
               label={isGeneratingReflection ? "Reflecting..." : "Save & Reflect"}
-              className="gap-2"
+              size="sm"
             />
             <GlassButton
               variant="secondary"
               onClick={() => navigate("/saved")}
               label="My Selves"
-              className="gap-2"
+              size="sm"
             />
           </div>
-        </div>
+        </motion.div>
 
-        {/* Main layout */}
+        {/* Main Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Profile card */}
-          <div className="lg:col-span-1">
+          {/* Profile Card */}
+          <motion.div
+            className="lg:col-span-1"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <ProfileCard alternateSelf={alternateSelf} userName={user.name} />
-          </div>
+          </motion.div>
 
-          {/* Chat area */}
-          <div className="lg:col-span-2">
-            <Card className="p-6 shadow-[0_0_25px_rgba(113,208,227,0.1)] border-white/10 bg-[#0F1623]/60 backdrop-blur-md h-[600px] flex flex-col">
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-        {messages.length === 0 && (
-                  <div className="text-center text-muted-foreground py-12">
-          <p className="text-lg mb-2">Start a conversation with your Alternate Self</p>
-                    <p className="text-sm">Ask them about their life, choices, or perspectives</p>
+          {/* Chat Area */}
+          <motion.div
+            className="lg:col-span-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card
+              className="p-5 md:p-6 h-[600px] flex flex-col overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                border: '1px solid hsl(0 0% 100% / 0.06)',
+                boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.4), 0 0 30px -10px hsl(35 35% 65% / 0.08)',
+              }}
+            >
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin">
+                {messages.length === 0 && (
+                  <div className="text-center py-16">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[hsl(35_35%_65%/0.2)] to-[hsl(35_35%_65%/0.2)] flex items-center justify-center">
+                        <Sparkles className="w-7 h-7 text-[hsl(35_35%_65%)]" />
+                      </div>
+                      <p className="text-white/60 text-lg font-medium mb-2">Start a conversation</p>
+                      <p className="text-white/30 text-sm max-w-sm mx-auto">
+                        Ask your Alternate Self about their life, choices, or perspectives
+                      </p>
+                    </motion.div>
                   </div>
                 )}
 
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                        message.role === "user"
-                          ? "gradient-primary text-white"
-                          : "bg-muted text-foreground"
-                      }`}
+                <AnimatePresence mode="popLayout">
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}
                     >
-                      <p className="text-sm leading-relaxed">{message.content}</p>
-                    </div>
-                    {message.memorySnippet && (
-                      <MemorySnippetBadge
-                        text={message.memorySnippet.content}
-                        emotionalTone={message.memorySnippet.emotional_tone}
-                      />
-                    )}
-                  </div>
-                ))}
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.role === "user"
+                            ? "bg-gradient-to-r from-[hsl(35_35%_65%/0.15)] to-[hsl(35_35%_65%/0.1)] border border-[hsl(35_35%_65%/0.2)] text-white"
+                            : "bg-white/[0.04] border border-white/[0.06] text-white/90"
+                          }`}
+                      >
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                      {message.memorySnippet && (
+                        <MemorySnippetBadge
+                          text={message.memorySnippet.content}
+                          emotionalTone={message.memorySnippet.emotional_tone}
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
 
                 {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-2xl px-4 py-3">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                  <motion.div
+                    className="flex justify-start"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <div className="bg-white/[0.04] border border-white/[0.06] rounded-2xl px-5 py-3">
+                      <div className="flex gap-1.5">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            className="w-2 h-2 rounded-full bg-[hsl(35_35%_65%)]"
+                            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
+                            transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
-              <div className="flex gap-2 items-center">
+              {/* Input Area */}
+              <div className="flex gap-3 items-center pt-4 border-t border-white/[0.06]">
                 <div className="hidden sm:block">
                   <select
                     value={mode}
                     onChange={(e) => setMode(e.target.value)}
-                    className="px-3 py-2 rounded-md bg-muted text-foreground text-sm"
+                    className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/70 text-sm focus:border-[hsl(35_35%_65%/0.4)] focus:outline-none transition-colors"
                   >
                     <option value="exploratory">Exploratory</option>
                     <option value="therapy">Therapy</option>
                     <option value="concise">Concise</option>
                   </select>
                 </div>
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSend()}
-                  placeholder="Type your message..."
-                  disabled={isLoading}
-                  className="flex-1"
-                  style={{
-                    boxShadow: currentSentiment ? `0 0 20px ${currentSentiment.colorTone}40` : undefined,
-                    borderColor: currentSentiment ? currentSentiment.colorTone : undefined,
-                  }}
-                />
+
+                <div className="flex-1 relative">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSend()}
+                    placeholder="Type your message..."
+                    disabled={isLoading}
+                    className="bg-white/[0.03] border-white/[0.08] rounded-xl pr-12 text-white placeholder:text-white/30 focus:border-[hsl(35_35%_65%/0.4)] transition-all"
+                    style={{
+                      boxShadow: currentSentiment ? `0 0 20px -5px ${currentSentiment.colorTone}40` : undefined,
+                    }}
+                  />
+                </div>
+
                 <GlassButton
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
-                  label={isLoading ? "..." : "Send"}
-                  className="min-w-[96px]"
+                  label={<Send className="w-4 h-4" />}
+                  className="!px-4"
                 />
               </div>
             </Card>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Subtle radial glow */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(113,208,227,0.08)_0%,transparent_80%)]" />
-
       {/* Reflection Modal */}
       <Dialog open={showReflectionModal} onOpenChange={setShowReflectionModal}>
-        <DialogContent className="max-w-2xl glass-card border-primary/30">
+        <DialogContent
+          className="max-w-2xl"
+          style={{
+            background: 'linear-gradient(135deg, hsl(222 47% 6%) 0%, hsl(222 47% 4%) 100%)',
+            border: '1px solid hsl(35 35% 65% / 0.2)',
+            boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.5), 0 0 40px -10px hsl(35 35% 65% / 0.2)',
+          }}
+        >
           <DialogHeader>
-            <DialogTitle className="text-2xl gradient-text">Reflections</DialogTitle>
+            <DialogTitle
+              className="text-2xl font-['Clash_Display'] text-transparent bg-clip-text"
+              style={{
+                backgroundImage: 'linear-gradient(135deg, hsl(35 35% 65%) 0%, hsl(35 35% 65%) 100%)',
+              }}
+            >
+              Reflections
+            </DialogTitle>
           </DialogHeader>
           {reflection && <ReflectionCard reflection={reflection} />}
           <GlassButton

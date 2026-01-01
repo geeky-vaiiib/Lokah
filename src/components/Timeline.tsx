@@ -14,7 +14,7 @@ interface TimelineProps {
 }
 
 const axisColors: Record<string, string> = {
-  career: "from-purple-400 to-pink-400",
+  career: "from-gold-400 to-pink-400",
   relationship: "from-rose-400 to-pink-400",
   location: "from-cyan-400 to-blue-400",
   values: "from-amber-400 to-orange-400",

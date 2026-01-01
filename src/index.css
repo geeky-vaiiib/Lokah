@@ -1,470 +1,339 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Clash+Display:wght@600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
-All colors MUST be HSL.
-Lokah Brand System - Cosmic, Reflective, Cinematic
-*/
+/* ==========================================
+   LOKAH DESIGN SYSTEM - Warm Beige Edition
+   Elegant, warm, and professional
+   ========================================== */
 
 @layer base {
-:root {
-  /* Lokah Brand Colors */
-  --bg: 195 50 15;  /* #071d26 - deep cosmic teal */
-  --surface: 0 0 3;  /* rgba(255,255,255,0.03) */
-  --accentA: 45 85 78;  /* #F3E9B0 - soft cream */
-  --accentB: 185 85 65;  /* #6AE7E6 - teal-cyan */
-  --muted: 35 25 75;  /* #9FB3BC */
-  --highlight: linear-gradient(90deg,var(--accentA),var(--accentB));
+  :root {
+    /* ========================================
+       CORE COLOR TOKENS - Warm Beige Palette
+       ======================================== */
 
-  /* Shorthand mappings for shadcn/ui compatibility */
-  --background: var(--bg);
-  --foreground: 35 35 95;  /* #FFF9EF */
+    /* Base Backgrounds - Deep warm charcoal */
+    --bg-base: 30 15% 6%;
+    --bg-surface: 30 12% 9%;
+    --bg-elevated: 30 10% 12%;
 
-  --card: var(--surface);
-  --card-foreground: 35 35 95;
+    /* Brand Colors - Primary Beige/Sand */
+    --brand-beige: 35 35% 65%;
+    --brand-beige-light: 38 40% 80%;
+    --brand-beige-dark: 32 30% 45%;
+    --brand-beige-glow: 40 45% 75%;
 
-  --popover: var(--surface);
-  --popover-foreground: 35 35 95;
+    /* Brand Colors - Cream (lighter accent) */
+    --brand-cream: 45 50% 90%;
+    --brand-cream-dim: 42 35% 75%;
 
-  --primary: var(--accentA);
-  --primary-foreground: var(--bg);
+    /* Brand Colors - Warm Copper (accent) */
+    --brand-copper: 25 55% 50%;
+    --brand-copper-glow: 25 65% 60%;
 
-  --secondary: var(--accentB);
-  --secondary-foreground: var(--bg);
+    /* Brand Colors - Taupe (muted complement) */
+    --brand-taupe: 30 15% 40%;
+    --brand-taupe-light: 30 12% 55%;
 
-  --accent: var(--accentB);
-  --accent-foreground: var(--bg);
+    /* HSL Variables for Shadcn/Tailwind */
+    --background: 30 15% 6%;
+    --foreground: 40 30% 92%;
 
-  --muted-foreground: var(--muted);
+    --card: 30 12% 9%;
+    --card-foreground: 40 30% 92%;
 
-  --destructive: 0 75 60;
-  --destructive-foreground: 35 35 95;
+    --popover: 30 12% 9%;
+    --popover-foreground: 40 30% 92%;
 
-  --border: 0 0 10;
-  --input: 0 0 8;
-  --ring: var(--accentA);
+    --primary: 35 35% 65%;
+    --primary-foreground: 30 15% 6%;
 
-  --radius: 16px;
+    --secondary: 25 55% 50%;
+    --secondary-foreground: 40 30% 92%;
 
-  /* Lokah Mystic Gradients - Cosmic Consciousness */
-  --gradient-primary: linear-gradient(90deg, #F8E6A0 0%, #A9F3E0 50%, #00E4FF 100%);
-  --gradient-secondary: linear-gradient(90deg, #A9F3E0 0%, #00E4FF 100%);
-  --gradient-subtle: linear-gradient(135deg, hsl(220 25% 12%) 0%, hsl(215 30% 16%) 100%);
-  --gradient-card: linear-gradient(135deg, hsla(0 0% 100% / 0.06) 0%, hsla(0 0% 100% / 0.03) 100%);
-  --gradient-hero: radial-gradient(ellipse at center, hsl(215 30% 15%) 0%, hsl(220 35% 8%) 50%, hsl(225 40% 6%) 100%);
-  --gradient-glow: linear-gradient(90deg, #F8E6A0 0%, #00E4FF 100%);
-  --gradient-portal: linear-gradient(135deg, #F8E6A0 0%, hsl(220 25% 12%) 100%);
-  --gradient-deathly: linear-gradient(135deg, #F8E6A0 0%, #A9F3E0 50%, #00E4FF 100%);
+    --muted: 30 12% 18%;
+    --muted-foreground: 35 20% 55%;
 
-  /* Mystic Shadows - Deep and metallic */
-  --shadow-soft: 0 8px 32px hsla(40 70% 75% / 0.08);
-  --shadow-card: 0 4px 24px hsla(0 0% 0% / 0.5);
-  --shadow-elevated: 0 12px 48px hsla(0 0% 0% / 0.7);
-  --shadow-glow: 0 0 32px hsla(40 70% 75% / 0.4);
-  --shadow-portal: 0 0 50px hsla(45 80% 85% / 0.3);
-  --shadow-deathly: 0 0 60px hsla(35 55% 70% / 0.2);
+    --accent: 35 30% 50%;
+    --accent-foreground: 40 30% 92%;
 
-  /* Transitions - Smooth and cinematic */
-  --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-cinematic: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 40 30% 92%;
 
-  /* Spacing Scale */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
+    --border: 30 12% 18%;
+    --input: 30 12% 18%;
+    --ring: 35 35% 65%;
 
-  /* Lokah brand tokens */
-  --lokah-bg-base: #0B0C10;
-  --lokah-bg-mid: #0E1A2E;
-  --lokah-bg-top: #13213A;
-  --lokah-gradient: linear-gradient(90deg, #B693FF 0%, #71D0E3 100%);
-  --lokah-gradient-subtle: linear-gradient(180deg, rgba(182,147,255,0.25) 0%, rgba(113,208,227,0.25) 100%);
-  --lokah-accent: #71D0E3;
-  --lokah-accent-secondary: #B693FF;
-  --lokah-text-primary: #F5F7FA;
-  --lokah-text-secondary: #A6CFFF;
-  --lokah-shadow-glow: 0 0 20px rgba(113,208,227,0.25);
-}
+    --radius: 0.75rem;
 
-.dark {
-  --background: 20 25 35;
-  --foreground: 248 250 252;
-  
-  --card: 30 38 52;
-  --card-foreground: 248 250 252;
-  
-  --popover: 30 38 52;
-  --popover-foreground: 248 250 252;
-  
-  --primary: 210 75 65;
-  --primary-foreground: 255 255 255;
-  
-  --secondary: 45 100 60;
-  --secondary-foreground: 20 25 35;
-  
-  --accent: 210 80 75;
-  --accent-foreground: 20 25 35;
-  
-  --muted: 215 20 25;
-  --muted-foreground: 215 16 65;
-  
-  --border: 215 25 25;
-  --input: 215 25 25;
-  --ring: 210 75 65;
-  
-  /* Dark mode gradients */
-  --gradient-primary: linear-gradient(135deg, hsl(210 75% 55%) 0%, hsl(45 100% 45%) 100%);
-  --gradient-subtle: linear-gradient(180deg, hsl(20 25 35) 0%, hsl(210 40% 15%) 100%);
-  --gradient-card: linear-gradient(135deg, hsl(210 40% 15%) 0%, hsl(45 30% 15%) 100%);
-  --gradient-hero: linear-gradient(135deg, hsl(210 75% 55%) 0%, hsl(195 80% 65%) 50%, hsl(45 100% 60%) 100%);
-  
-  /* Dark shadows */
-  --shadow-soft: 0 8px 32px hsla(0 0% 0% / 0.4);
-  --shadow-card: 0 4px 24px hsla(0 0% 0% / 0.3);
-  --shadow-elevated: 0 12px 48px hsla(0 0% 0% / 0.5);
-  --shadow-glow: 0 0 32px hsla(210 75% 65% / 0.2);
-}
+    /* ========================================
+       GRADIENT TOKENS - Warm & Elegant
+       ======================================== */
+    --lokah-gradient-primary: linear-gradient(135deg, hsl(35 35% 65%) 0%, hsl(25 55% 50%) 100%);
+    --lokah-gradient-subtle: linear-gradient(135deg, hsl(35 35% 65% / 0.15) 0%, hsl(25 55% 50% / 0.08) 100%);
+    --lokah-gradient-card: linear-gradient(135deg, hsl(30 12% 10% / 0.95) 0%, hsl(30 12% 7% / 0.98) 100%);
+    --lokah-gradient-glow: radial-gradient(circle at center, hsl(35 35% 65% / 0.1) 0%, transparent 60%);
+    --lokah-gradient-border: linear-gradient(135deg, hsl(35 35% 65% / 0.25) 0%, hsl(25 55% 50% / 0.15) 100%);
 
-  * {
-    @apply border-border;
+    /* ========================================
+       SHADOW TOKENS
+       ======================================== */
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 25px -8px hsl(35 35% 65% / 0.25);
+    --shadow-elevated: 0 20px 40px -12px hsl(0 0% 0% / 0.5);
+    --shadow-card: 0 4px 24px -4px hsl(0 0% 0% / 0.3), 0 0 0 1px hsl(30 12% 15% / 0.5);
   }
 
+  /* ========================================
+     KEYFRAME ANIMATIONS
+     ======================================== */
+  @keyframes pulse-subtle {
+
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes glow-pulse {
+
+    0%,
+    100% {
+      box-shadow: 0 0 15px -5px hsl(35 35% 65% / 0.15);
+    }
+
+    50% {
+      box-shadow: 0 0 25px -5px hsl(35 35% 65% / 0.3);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  /* ========================================
+     SCROLLBAR STYLING
+     ======================================== */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--bg-base));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--brand-taupe) / 0.5);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand-beige) / 0.4);
+  }
+
+  /* ========================================
+     BASE ELEMENT STYLING
+     ======================================== */
   body {
-    background: linear-gradient(135deg, #0B0C10 0%, #0E1A2E 50%, #13213A 100%);
-    color: #F5F7FA;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 16px;
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse 100% 60% at 50% -20%, hsl(var(--brand-beige) / 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 50% at 80% 100%, hsl(var(--brand-copper) / 0.03) 0%, transparent 50%);
+    background-attachment: fixed;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    letter-spacing: 0.01em;
     line-height: 1.6;
-    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    animation: lokahGradientShift 50s ease-in-out infinite;
-    background-size: 200% 200%;
   }
 
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes parallaxShift {
-    0% { background-position: 0% 0%; }
-    33% { background-position: 100% 50%; }
-    66% { background-position: 50% 100%; }
-    100% { background-position: 0% 0%; }
-  }
-
-  @keyframes rotateGradientBorder {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes rotateBorder {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes sparkleFloat {
-    0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
-    50% { transform: translateY(-2px) scale(1.1); opacity: 1; }
-  }
-
-  @keyframes breathe {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(1.05); }
-  }
-
-  @keyframes ctaGradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes rotateGlow {
-    0% { transform: rotate(0deg); opacity: 0.7; }
-    100% { transform: rotate(360deg); opacity: 1; }
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Clash Display', serif;
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Clash Display', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
     font-weight: 600;
-    letter-spacing: 0.25em;
+    color: hsl(var(--brand-cream));
   }
 
-  p, body {
-    font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  @media (min-width: 768px) {
-    body {
-      font-size: 18px;
-    }
+  ::selection {
+    background: hsl(var(--brand-beige) / 0.25);
+    color: hsl(var(--foreground));
   }
 }
 
-/* Global font & theme consistency */
-body {
-  @apply bg-[#0B0C10] text-white font-[Inter] antialiased;
-}
-h1, h2, h3 {
-  @apply font-[ClashDisplay] uppercase tracking-[0.08em];
-}
+/* ========================================
+   COMPONENT CLASSES
+   ======================================== */
+@layer components {
 
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@layer utilities {
-  .gradient-primary {
-    background: var(--gradient-primary);
-  }
-  
-  .gradient-accent {
-    background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--secondary)));
-  }
-  
-  .gradient-subtle {
-    background: var(--gradient-subtle);
-  }
-  
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-  
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-  
-  .transition-smooth {
-    transition: var(--transition-smooth);
-  }
-
-  /* Glassmorphism */
-  .glass-card {
-    background: hsla(0, 0%, 100%, 0.05);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid hsla(var(--border) / 0.5);
-    box-shadow: var(--shadow-card);
-  }
-
-  .glass-elevated {
-    background: hsla(0, 0%, 100%, 0.06);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid hsla(var(--border) / 0.6);
-    box-shadow: var(--shadow-elevated);
-  }
-
-  .glass-input {
-    background: hsla(0, 0%, 100%, 0.04);
+  .glass-panel {
+    background: hsl(var(--bg-surface) / 0.85);
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid hsla(var(--border) / 0.3);
-  }
-  
-  /* Cinematic glow effects */
-  .glow-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    pointer-events: none;
-  }
-  
-  .text-balance {
-    text-wrap: balance;
+    border: 1px solid hsl(var(--border) / 0.6);
+    border-radius: var(--radius);
   }
 
-  /* Gradient text */
-  .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .glass-card {
+    background: var(--lokah-gradient-card);
+    border: 1px solid hsl(30 12% 16% / 0.7);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
   }
 
-  /* --------------- LOKAH LOGO SYSTEM --------------- */
-
-  .lokah-logo {
-    opacity: 1 !important;
-    visibility: visible !important;
-    mix-blend-mode: normal !important;
-    z-index: 50;
-    filter: none !important;
-    pointer-events: none;
-  }
-
-  .lokah-wordmark {
-    background: linear-gradient(90deg, #E8FFF7 0%, #A8FFF5 40%, #7AFFF8 100%);
-  background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow:
-      0 0 12px rgba(160, 255, 240, 0.35),
-      0 2px 14px rgba(0, 0, 0, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: text-shadow 0.3s ease, transform 0.3s ease;
-  }
-
-  /* Strengthen 'L' and 'KAH' edges for visibility */
-  .lokah-l, .lokah-rest {
-    text-shadow:
-      0 0 10px rgba(160, 255, 250, 0.45),
-      0 0 25px rgba(0, 255, 255, 0.15);
-  }
-
-  /* ----- The Portal "O" ----- */
-  .lokah-o {
-    width: 3.6rem;
-    height: 3.6rem;
+  .gradient-border {
     position: relative;
-    flex-shrink: 0;
+    background: hsl(var(--bg-surface));
+    border-radius: var(--radius);
   }
 
-  .lokah-ring {
+  .gradient-border::before {
+    content: '';
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1.4px solid rgba(130, 255, 255, 0.85);
-    box-shadow:
-      0 0 16px rgba(110, 255, 255, 0.35),
-      inset 0 0 10px rgba(0, 255, 255, 0.1);
-    animation: rotatePortal 40s linear infinite;
-  }
-
-  .lokah-core {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, #E4FFF8 0%, #96F5FF 45%, transparent 100%);
-    box-shadow:
-      0 0 10px rgba(150, 255, 255, 0.45),
-      0 0 25px rgba(100, 255, 240, 0.25);
-    animation: softPulse 4s ease-in-out infinite;
-  }
-
-  @keyframes rotatePortal {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes softPulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 0.85;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 1;
-    }
-  }
-
-  /* Subtle glow behind the logo */
-  .lokah-logo::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(140,255,255,0.08), transparent 75%);
-    z-index: -1;
-  }
-
-  /* Responsive scaling */
-  @media (max-width: 768px) {
-    .lokah-wordmark {
-      font-size: 3.2rem;
-    }
-    .lokah-o {
-      width: 2.6rem;
-      height: 2.6rem;
-    }
-    .lokah-logo::before {
-      width: 180px;
-      height: 180px;
-    }
-  }
-
-  /* Multiverse symbol styles */
-  .multiverse-helix {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  /* Removed legacy shimmer/particles/button classes to avoid layout shift and conflicts with new Tailwind-based Button. */
-
-  /* Lokah brand tokens */
-  :root {
-    --lokah-bg-base: #0B0C10;
-    --lokah-bg-mid: #0E1A2E;
-    --lokah-bg-top: #13213A;
-    --lokah-gradient: linear-gradient(90deg, #B693FF 0%, #71D0E3 100%);
-    --lokah-gradient-subtle: linear-gradient(180deg, rgba(182,147,255,0.25) 0%, rgba(113,208,227,0.25) 100%);
-    --lokah-accent: #71D0E3;
-    --lokah-accent-secondary: #B693FF;
-    --lokah-text-primary: #F5F7FA;
-    --lokah-text-secondary: #A6CFFF;
-    --lokah-shadow-glow: 0 0 20px rgba(113,208,227,0.25);
-  }
-
-  @keyframes lokahGradientShift {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
-    100% { background-position: 0% 0%; }
-  }
-
-  /* Global typography letter-spacing */
-  body { letter-spacing: 0.03em; }
-
-  /* Utilities */
-  .lokah-gradient-text {
-    background: var(--lokah-gradient);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .lokah-gradient-border {
-    position: relative;
-  }
-  .lokah-gradient-border::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+    inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: var(--lokah-gradient);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    background: linear-gradient(135deg,
+        hsl(var(--brand-beige) / 0.35) 0%,
+        hsl(var(--brand-copper) / 0.2) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: lokahGradientShift 40s linear infinite;
+    mask-composite: exclude;
+    pointer-events: none;
   }
+
+  .glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+@layer utilities {
+
+  .text-gradient {
+    background: var(--lokah-gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 4s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background-size: 400% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .focus-ring {
+    @apply outline-none;
+    ring-color: hsl(var(--brand-beige));
+  }
+
+  .focus-ring:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--bg-base)), 0 0 0 4px hsl(var(--brand-beige) / 0.4);
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.01;
+    background: repeating-linear-gradient(0deg,
+        transparent,
+        transparent 2px,
+        hsl(var(--foreground) / 0.02) 2px,
+        hsl(var(--foreground) / 0.02) 4px);
+  }
+}
+
+/* ========================================
+   INPUT STYLING
+   ======================================== */
+.glass-input {
+  background: hsl(var(--bg-surface) / 0.7);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.glass-input:hover {
+  border-color: hsl(var(--brand-taupe) / 0.6);
+  background: hsl(var(--bg-surface) / 0.9);
+}
+
+.glass-input:focus {
+  border-color: hsl(var(--brand-beige) / 0.5);
+  box-shadow: 0 0 0 3px hsl(var(--brand-beige) / 0.1);
+  outline: none;
+}
+
+/* ========================================
+   ADDITIONAL STYLES
+   ======================================== */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  border-color: hsl(var(--brand-beige) / 0.3);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.data-grid {
+  background-image:
+    linear-gradient(hsl(var(--brand-beige) / 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--brand-beige) / 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.status-online {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--brand-beige));
+  box-shadow: 0 0 8px hsl(var(--brand-beige) / 0.4);
+  animation: pulse-subtle 2s ease-in-out infinite;
 }

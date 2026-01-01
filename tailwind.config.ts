@@ -15,8 +15,8 @@ export default {
     },
     extend: {
       fontFamily: {
-  display: ['"Clash Display"', 'serif'],
-  body: ['"Satoshi"', 'Inter', 'sans-serif'],
+        display: ['"Clash Display"', 'serif'],
+        body: ['"Satoshi"', 'Inter', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -72,6 +72,19 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        'soft': '0 4px 20px -4px hsl(0 0% 0% / 0.3)',
+        'glow-teal': '0 0 40px -8px hsl(190 80% 62% / 0.4)',
+        'glow-purple': '0 0 40px -8px hsl(280 85% 50% / 0.4)',
+        'cosmic': '0 8px 32px -8px hsl(280 85% 50% / 0.2), 0 4px 16px -4px hsl(190 80% 62% / 0.1)',
+        'elevated': '0 25px 50px -12px hsl(0 0% 0% / 0.5)',
+        'card': '0 8px 32px -8px hsl(0 0% 0% / 0.4), inset 0 1px 0 0 hsl(0 0% 100% / 0.05)',
+        'button': '0 4px 14px 0 hsl(190 80% 62% / 0.3)',
+      },
+      backdropBlur: {
+        xs: '2px',
+        '3xl': '64px',
       },
       keyframes: {
         "accordion-down": {

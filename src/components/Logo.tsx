@@ -1,52 +1,60 @@
-import React from 'react';
-import styles from './Logo.module.css';
+import React from "react";
+import { LokahIcon } from "./LokahIcon";
+import { Link } from "react-router-dom";
 
-interface LogoProps {
-  variant?: 'wordmark' | 'symbol' | 'wordmark-portal';
-  size?: number;
-  animated?: boolean;
+export interface LogoProps {
+  variant?: "default" | "icon" | "wordmark" | "hero";
+  size?: number; // Size of the icon or text height
   className?: string;
+  asLink?: boolean;
 }
 
-export default function Logo({
-  variant = 'wordmark',
-  size = 48,
-  animated = false,
-  className = ''
-}: LogoProps) {
-  // variants: 'wordmark', 'symbol', 'wordmark-portal'
-  if (variant === 'symbol') {
-    return (
-      <img
-        src={animated ? '/lokah-symbol-anim.svg' : '/lokah-symbol-plain.svg'}
-        alt="Lokah symbol"
-        width={size}
-        height={size}
-        className={`${styles.symbol} ${className}`}
-        style={{ width: size, height: size }}
-      />
-    );
-  }
+export const Logo: React.FC<LogoProps> = ({
+  variant = "default",
+  size = 32,
+  className = "",
+  asLink = false
+}) => {
+  // Size calculations
+  const iconSize = variant === "hero" ? size * 1.5 : size;
+  const textSize = size;
 
-  if (variant === 'wordmark-portal') {
-    return (
-      <img
-        src="/lokah-wordmark-portal.svg"
-        alt="Lokah"
-        width={size * 4}
-        height={size}
-        className={`${styles.wordmark} ${className}`}
-      />
-    );
-  }
+  const Content = () => (
+    <div className={`flex items-center gap-3 select-none ${className}`}>
+      {/* Icon Section */}
+      {(variant === "default" || variant === "icon" || variant === "hero") && (
+        <LokahIcon size={iconSize} animated={true} />
+      )}
 
-  return (
-    <img
-      src="/lokah-wordmark.png"
-      alt="Lokah - Many Worlds, One You"
-      width={size * 4}
-      height={size}
-      className={`${styles.wordmark} ${className}`}
-    />
+      {/* Wordmark Section */}
+      {(variant === "default" || variant === "wordmark" || variant === "hero") && (
+        <div
+          className="flex flex-col leading-none"
+          style={{
+            fontFamily: '"Clash Display", sans-serif',
+            letterSpacing: '0.05em'
+          }}
+        >
+          <span
+            className="font-semibold uppercase text-white tracking-widest"
+            style={{ fontSize: textSize }}
+          >
+            Lokah
+          </span>
+        </div>
+      )}
+    </div>
   );
-}
+
+  if (asLink) {
+    return (
+      <Link to="/" className="hover:opacity-90 transition-opacity">
+        <Content />
+      </Link>
+    );
+  }
+
+  return <Content />;
+};
+
+export default Logo;

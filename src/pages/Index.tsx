@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import LokahBackground from "@/components/LokahBackground";
-import TopNav from "@/components/TopNav";
+import Logo from "@/components/Logo";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -18,14 +18,33 @@ const Index = () => {
   }, [user, navigate]);
 
   return (
-    <LokahBackground className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-6">
-        <TopNav />
-        <div className="flex min-h-[70vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[hsl(220 25% 4%)]">
+      {/* Background */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          background: `
+            radial-gradient(ellipse 60% 40% at 50% 50%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
+            hsl(222 47% 3%)
+          `,
+        }}
+      />
+
+      {/* Loading Content */}
+      <motion.div
+        className="flex flex-col items-center gap-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Logo size={48} variant="icon" className="animate-pulse" />
+
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin text-[hsl(35_35%_65%)]" />
+          <span className="text-white/40 text-sm tracking-wide">Synchronizing dimensions...</span>
         </div>
-      </div>
-    </LokahBackground>
+      </motion.div>
+    </div>
   );
 };
 

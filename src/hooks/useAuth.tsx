@@ -10,6 +10,26 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check for demo mode
+    const isDemo = import.meta.env.VITE_SUPABASE_URL?.includes("xawscxdrwzjzghshudpx");
+    const demoSession = localStorage.getItem("lokah_demo_session");
+
+    if (isDemo && demoSession) {
+      // Mock user for demo mode
+      const mockUser = {
+        id: "demo-user-123",
+        email: "traveler@lokah.cosmos",
+        user_metadata: { name: "Cosmic Traveler" },
+        app_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString()
+      } as unknown as User;
+      setUser(mockUser);
+      setSession({ user: mockUser, access_token: "mock", refresh_token: "mock", expires_in: 3600, token_type: "bearer" });
+      setLoading(false);
+      return;
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -30,6 +50,13 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
+    if (localStorage.getItem("lokah_demo_session")) {
+      localStorage.removeItem("lokah_demo_session");
+      setUser(null);
+      setSession(null);
+      navigate("/auth");
+      return;
+    }
     await supabase.auth.signOut();
     navigate("/auth");
   };
