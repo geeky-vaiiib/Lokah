@@ -5,15 +5,13 @@ import { GlassButton } from "@/components/GlassButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles, User, MapPin, GraduationCap, Heart, Compass, Brain, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "@/components/Logo";
-
 
 const TOTAL_STEPS = 8;
 
@@ -46,12 +44,14 @@ interface FormData {
   allowDataUsage: boolean;
 }
 
+const stepIcons = [User, MapPin, GraduationCap, Heart, Heart, Compass, Brain, CheckCircle2];
+
 const Onboarding = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [direction, setDirection] = useState(1); // 1 for forward, -1 for back
+  const [direction, setDirection] = useState(1);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -103,6 +103,21 @@ const Onboarding = () => {
   };
 
   const handleComplete = async () => {
+    // Check for demo mode first
+    const isDemo = import.meta.env.VITE_SUPABASE_URL?.includes("xawscxdrwzjzghshudpx");
+
+    if (isDemo) {
+      // Demo mode - skip Supabase, save to localStorage
+      setIsLoading(true);
+      setTimeout(() => {
+        localStorage.setItem("lokah_onboarding_data", JSON.stringify(formData));
+        toast.success("Demo Mode: Onboarding complete!");
+        navigate("/generator", { state: { userId: "demo-user", formData } });
+        setIsLoading(false);
+      }, 1000);
+      return;
+    }
+
     if (!user) {
       toast.error("Please sign in first");
       navigate("/auth");
@@ -159,31 +174,20 @@ const Onboarding = () => {
     }
   };
 
-  // Animation variants for step transitions
   const stepVariants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 40 : -40,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (dir: number) => ({
-      x: dir > 0 ? -40 : 40,
-      opacity: 0,
-    }),
+    enter: (dir: number) => ({ x: dir > 0 ? 30 : -30, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -30 : 30, opacity: 0 }),
   };
 
-  // Input styling
   const inputClassName = `
-    bg-white/[0.03] border-white/[0.08] rounded-xl
-    focus:border-[hsl(35_35%_65%/0.5)] focus:ring-1 focus:ring-[hsl(35_35%_65%/0.3)]
-    transition-all duration-300 text-white placeholder:text-white/30
-    hover:border-white/15 hover:bg-white/[0.04]
+    bg-[hsl(30_12%_8%)] border-[hsl(35_20%_18%)] rounded-lg
+    focus:border-[hsl(35_35%_65%/0.5)] focus:ring-1 focus:ring-[hsl(35_35%_65%/0.2)]
+    transition-all duration-200 text-[hsl(38_30%_90%)] placeholder:text-[hsl(30_15%_40%)]
+    hover:border-[hsl(35_25%_25%)] h-11
   `;
 
-  const labelClassName = "text-base font-medium text-white/90";
+  const labelClassName = "text-sm font-medium text-[hsl(38_30%_85%)] mb-1.5 block";
 
   const renderStep = () => {
     const content = (() => {
@@ -198,55 +202,71 @@ const Onboarding = () => {
                   value={formData.name}
                   onChange={(e) => updateField("name", e.target.value)}
                   placeholder="Enter your full name"
-                  className={`mt-2 ${inputClassName}`}
-                />
-              </div>
-              <div>
-                <Label htmlFor="age" className={labelClassName}>How old are you?</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={(e) => updateField("age", e.target.value)}
-                  placeholder="Your age"
-                  className={`mt-2 ${inputClassName}`}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pronouns" className={labelClassName}>What are your pronouns? (optional)</Label>
-                <Input
-                  id="pronouns"
-                  value={formData.pronouns}
-                  onChange={(e) => updateField("pronouns", e.target.value)}
-                  placeholder="e.g., she/her, he/him, they/them"
-                  className={`mt-2 ${inputClassName}`}
-                />
-              </div>
-            </div>
-          );
-
-        case 2:
-          return (
-            <div className="space-y-5">
-              <div>
-                <Label htmlFor="country" className={labelClassName}>Where in the world are you?</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => updateField("country", e.target.value)}
-                  placeholder="Country"
-                  className={`mt-2 ${inputClassName}`}
+                  className={inputClassName}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="state" className={labelClassName}>State/Region</Label>
+                  <Label htmlFor="age" className={labelClassName}>Age</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={(e) => updateField("age", e.target.value)}
+                    placeholder="e.g. 25"
+                    className={inputClassName}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="gender" className={labelClassName}>Gender</Label>
+                  <Select value={formData.gender} onValueChange={(val) => updateField("gender", val)}>
+                    <SelectTrigger className={inputClassName}>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[hsl(30_12%_10%)] border-[hsl(35_20%_18%)]">
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="non-binary">Non-binary</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="pronouns" className={labelClassName}>Preferred Pronouns</Label>
+                <Input
+                  id="pronouns"
+                  value={formData.pronouns}
+                  onChange={(e) => updateField("pronouns", e.target.value)}
+                  placeholder="e.g. they/them, he/him, she/her"
+                  className={inputClassName}
+                />
+              </div>
+            </div>
+          );
+        case 2:
+          return (
+            <div className="space-y-5">
+              <div>
+                <Label htmlFor="country" className={labelClassName}>Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => updateField("country", e.target.value)}
+                  placeholder="e.g. United States"
+                  className={inputClassName}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="state" className={labelClassName}>State/Province</Label>
                   <Input
                     id="state"
                     value={formData.state}
                     onChange={(e) => updateField("state", e.target.value)}
-                    placeholder="State or region"
-                    className={`mt-2 ${inputClassName}`}
+                    placeholder="e.g. California"
+                    className={inputClassName}
                   />
                 </div>
                 <div>
@@ -255,248 +275,211 @@ const Onboarding = () => {
                     id="city"
                     value={formData.city}
                     onChange={(e) => updateField("city", e.target.value)}
-                    placeholder="Your city"
-                    className={`mt-2 ${inputClassName}`}
+                    placeholder="e.g. San Francisco"
+                    className={inputClassName}
                   />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="languages" className={labelClassName}>What languages do you speak?</Label>
-                <Input
-                  id="languages"
-                  value={formData.languages}
-                  onChange={(e) => updateField("languages", e.target.value)}
-                  placeholder="e.g., English, Spanish, Mandarin"
-                  className={`mt-2 ${inputClassName}`}
-                />
-              </div>
             </div>
           );
-
         case 3:
           return (
             <div className="space-y-5">
               <div>
-                <Label htmlFor="education" className={labelClassName}>Highest level of education</Label>
-                <Select value={formData.education} onValueChange={(value) => updateField("education", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
+                <Label htmlFor="education" className={labelClassName}>Highest Education</Label>
+                <Select value={formData.education} onValueChange={(val) => updateField("education", val)}>
+                  <SelectTrigger className={inputClassName}>
                     <SelectValue placeholder="Select education level" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
-                    <SelectItem value="high_school">High School</SelectItem>
-                    <SelectItem value="associate">Associate Degree</SelectItem>
-                    <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
-                    <SelectItem value="master">Master's Degree</SelectItem>
-                    <SelectItem value="doctorate">Doctorate/PhD</SelectItem>
+                  <SelectContent className="bg-[hsl(30_12%_10%)] border-[hsl(35_20%_18%)]">
+                    <SelectItem value="high-school">High School</SelectItem>
+                    <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
+                    <SelectItem value="masters">Master's Degree</SelectItem>
+                    <SelectItem value="phd">PhD or Doctorate</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="fieldOfStudy" className={labelClassName}>What did you study? (optional)</Label>
+                <Label htmlFor="fieldOfStudy" className={labelClassName}>Field of Study</Label>
                 <Input
                   id="fieldOfStudy"
                   value={formData.fieldOfStudy}
                   onChange={(e) => updateField("fieldOfStudy", e.target.value)}
-                  placeholder="Your field of study"
-                  className={`mt-2 ${inputClassName}`}
+                  placeholder="e.g. Computer Science"
+                  className={inputClassName}
                 />
               </div>
               <div>
-                <Label htmlFor="occupation" className={labelClassName}>What do you do for work?</Label>
+                <Label htmlFor="occupation" className={labelClassName}>Current Occupation</Label>
                 <Input
                   id="occupation"
                   value={formData.occupation}
                   onChange={(e) => updateField("occupation", e.target.value)}
-                  placeholder="Current occupation or aspiration"
-                  className={`mt-2 ${inputClassName}`}
+                  placeholder="e.g. Software Engineer"
+                  className={inputClassName}
                 />
               </div>
             </div>
           );
-
         case 4:
           return (
             <div className="space-y-5">
               <div>
-                <Label htmlFor="familyStatus" className={labelClassName}>What's your family situation?</Label>
-                <Select value={formData.familyStatus} onValueChange={(value) => updateField("familyStatus", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
-                    <SelectValue placeholder="Select family status" />
+                <Label htmlFor="familyStatus" className={labelClassName}>Family Status</Label>
+                <Select value={formData.familyStatus} onValueChange={(val) => updateField("familyStatus", val)}>
+                  <SelectTrigger className={inputClassName}>
+                    <SelectValue placeholder="Select" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
+                  <SelectContent className="bg-[hsl(30_12%_10%)] border-[hsl(35_20%_18%)]">
                     <SelectItem value="single">Single</SelectItem>
-                    <SelectItem value="relationship">In a relationship</SelectItem>
                     <SelectItem value="married">Married</SelectItem>
                     <SelectItem value="divorced">Divorced</SelectItem>
                     <SelectItem value="widowed">Widowed</SelectItem>
-                    <SelectItem value="complicated">It's complicated</SelectItem>
+                    <SelectItem value="in-relationship">In a Relationship</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="familyBackground" className={labelClassName}>How would you describe your family background?</Label>
-                <Select value={formData.familyBackground} onValueChange={(value) => updateField("familyBackground", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
-                    <SelectValue placeholder="Select background" />
+                <Label htmlFor="familyBackground" className={labelClassName}>Family Economic Background</Label>
+                <Select value={formData.familyBackground} onValueChange={(val) => updateField("familyBackground", val)}>
+                  <SelectTrigger className={inputClassName}>
+                    <SelectValue placeholder="Select" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
-                    <SelectItem value="supportive">Very supportive</SelectItem>
-                    <SelectItem value="traditional">Traditional/conservative</SelectItem>
-                    <SelectItem value="liberal">Progressive/liberal</SelectItem>
-                    <SelectItem value="strict">Strict/demanding</SelectItem>
-                    <SelectItem value="distant">Emotionally distant</SelectItem>
-                    <SelectItem value="complicated">Complicated dynamics</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          );
-
-        case 5:
-          return (
-            <div className="space-y-5">
-              <div>
-                <Label htmlFor="economicStatus" className={labelClassName}>Current economic situation</Label>
-                <Select value={formData.economicStatus} onValueChange={(value) => updateField("economicStatus", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
-                    <SelectItem value="struggling">Financial hardship</SelectItem>
-                    <SelectItem value="modest">Getting by</SelectItem>
-                    <SelectItem value="comfortable">Comfortable</SelectItem>
+                  <SelectContent className="bg-[hsl(30_12%_10%)] border-[hsl(35_20%_18%)]">
+                    <SelectItem value="low-income">Low Income</SelectItem>
+                    <SelectItem value="middle-class">Middle Class</SelectItem>
+                    <SelectItem value="upper-middle">Upper Middle Class</SelectItem>
                     <SelectItem value="affluent">Affluent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          );
+        case 5:
+          return (
+            <div className="space-y-5">
               <div>
-                <Label htmlFor="employmentSecurity" className={labelClassName}>How secure is your employment?</Label>
-                <Select value={formData.employmentSecurity} onValueChange={(value) => updateField("employmentSecurity", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
-                    <SelectValue placeholder="Select security level" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
-                    <SelectItem value="very_secure">Very secure</SelectItem>
-                    <SelectItem value="stable">Stable</SelectItem>
-                    <SelectItem value="uncertain">Uncertain</SelectItem>
-                    <SelectItem value="precarious">Precarious</SelectItem>
-                    <SelectItem value="not_applicable">Not applicable</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="religion" className={labelClassName}>Religion or Spirituality</Label>
+                <Input
+                  id="religion"
+                  value={formData.religion}
+                  onChange={(e) => updateField("religion", e.target.value)}
+                  placeholder="e.g. Buddhist, Agnostic, Christian"
+                  className={inputClassName}
+                />
+              </div>
+              <div>
+                <Label htmlFor="ethnicity" className={labelClassName}>Ethnicity</Label>
+                <Input
+                  id="ethnicity"
+                  value={formData.ethnicity}
+                  onChange={(e) => updateField("ethnicity", e.target.value)}
+                  placeholder="e.g. Asian, Hispanic"
+                  className={inputClassName}
+                />
+              </div>
+              <div>
+                <Label htmlFor="languages" className={labelClassName}>Languages Spoken</Label>
+                <Input
+                  id="languages"
+                  value={formData.languages}
+                  onChange={(e) => updateField("languages", e.target.value)}
+                  placeholder="e.g. English, Spanish, Mandarin"
+                  className={inputClassName}
+                />
               </div>
             </div>
           );
-
         case 6:
           return (
             <div className="space-y-5">
               <div>
-                <Label htmlFor="personalityType" className={labelClassName}>How would you describe yourself?</Label>
-                <Select value={formData.personalityType} onValueChange={(value) => updateField("personalityType", value)}>
-                  <SelectTrigger className={`mt-2 ${inputClassName}`}>
-                    <SelectValue placeholder="Select personality type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0a0e14] border-white/10">
-                    <SelectItem value="introvert">Introvert</SelectItem>
-                    <SelectItem value="extrovert">Extrovert</SelectItem>
-                    <SelectItem value="ambivert">Ambivert (both)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="values" className={labelClassName}>What are your core values?</Label>
-                <p className="text-sm text-white/40 mt-1 mb-2">
-                  List 3-5 values that guide your life
-                </p>
-                <Textarea
-                  id="values"
-                  value={formData.values}
-                  onChange={(e) => updateField("values", e.target.value)}
-                  placeholder="family, creativity, authenticity..."
-                  className={inputClassName}
-                  rows={3}
-                />
-              </div>
-            </div>
-          );
-
-        case 7:
-          return (
-            <div className="space-y-5">
-              <div>
-                <Label htmlFor="majorChoice" className={labelClassName}>Tell me about a major life choice you've made</Label>
-                <p className="text-sm text-white/40 mt-1 mb-2">
-                  This could be about career, education, relationships, or where you live
-                </p>
+                <Label htmlFor="majorChoice" className={labelClassName}>A Major Life Choice You Made</Label>
                 <Textarea
                   id="majorChoice"
                   value={formData.majorChoice}
                   onChange={(e) => updateField("majorChoice", e.target.value)}
-                  placeholder="I chose to study engineering instead of pursuing art..."
-                  className={inputClassName}
-                  rows={4}
+                  placeholder="Describe a significant decision that shaped your life..."
+                  className={`${inputClassName} min-h-[100px] resize-none`}
                 />
               </div>
               <div>
-                <Label htmlFor="unchosenPath" className={labelClassName}>What's a path you didn't take but wonder about?</Label>
-                <p className="text-sm text-white/40 mt-1 mb-2">
-                  A dream, choice, or version of life that almost happened
-                </p>
+                <Label htmlFor="unchosenPath" className={labelClassName}>The Path You Didn't Take</Label>
                 <Textarea
                   id="unchosenPath"
                   value={formData.unchosenPath}
                   onChange={(e) => updateField("unchosenPath", e.target.value)}
-                  placeholder="I always wondered what life would be like if I had moved abroad..."
-                  className={inputClassName}
-                  rows={4}
+                  placeholder="What alternative path did you not pursue?"
+                  className={`${inputClassName} min-h-[100px] resize-none`}
                 />
               </div>
             </div>
           );
-
-        case 8:
+        case 7:
           return (
             <div className="space-y-5">
               <div>
-                <Label htmlFor="lifeRegret" className={labelClassName}>Is there something you deeply regret? (optional)</Label>
+                <Label htmlFor="personalityType" className={labelClassName}>Personality Type</Label>
+                <Input
+                  id="personalityType"
+                  value={formData.personalityType}
+                  onChange={(e) => updateField("personalityType", e.target.value)}
+                  placeholder="e.g. INTJ, Type 4, Introvert"
+                  className={inputClassName}
+                />
+              </div>
+              <div>
+                <Label htmlFor="values" className={labelClassName}>Core Values</Label>
+                <Input
+                  id="values"
+                  value={formData.values}
+                  onChange={(e) => updateField("values", e.target.value)}
+                  placeholder="e.g. Honesty, Growth, Family"
+                  className={inputClassName}
+                />
+              </div>
+              <div>
+                <Label htmlFor="lifeRegret" className={labelClassName}>A Life Regret (Optional)</Label>
                 <Textarea
                   id="lifeRegret"
                   value={formData.lifeRegret}
                   onChange={(e) => updateField("lifeRegret", e.target.value)}
-                  placeholder="This is a safe space..."
-                  className={inputClassName}
-                  rows={3}
+                  placeholder="Something you wish you had done differently..."
+                  className={`${inputClassName} min-h-[80px] resize-none`}
                 />
               </div>
-              <div>
-                <Label htmlFor="lifeChallenges" className={labelClassName}>What challenges have shaped you? (optional)</Label>
-                <Textarea
-                  id="lifeChallenges"
-                  value={formData.lifeChallenges}
-                  onChange={(e) => updateField("lifeChallenges", e.target.value)}
-                  placeholder="Loss, hardship, obstacles you've faced..."
-                  className={inputClassName}
-                  rows={3}
-                />
+            </div>
+          );
+        case 8:
+          return (
+            <div className="space-y-6">
+              <div className="p-5 rounded-xl bg-[hsl(35_35%_65%/0.08)] border border-[hsl(35_35%_65%/0.15)]">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="w-5 h-5 text-[hsl(35_35%_65%)] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-medium text-[hsl(38_40%_85%)] mb-1">You're ready to explore</h4>
+                    <p className="text-sm text-[hsl(30_15%_55%)]">
+                      Your alternate self will be created using this information to provide meaningful,
+                      personalized conversations.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-[hsl(30_12%_8%)] border border-[hsl(35_20%_15%)]">
                 <Checkbox
                   id="allowDataUsage"
                   checked={formData.allowDataUsage}
                   onCheckedChange={(checked) => updateField("allowDataUsage", !!checked)}
-                  className="border-white/20 data-[state=checked]:bg-[hsl(35_35%_65%)] data-[state=checked]:border-[hsl(35_35%_65%)]"
+                  className="mt-0.5 border-[hsl(35_20%_30%)] data-[state=checked]:bg-[hsl(35_35%_65%)] data-[state=checked]:border-[hsl(35_35%_65%)]"
                 />
-                <label
-                  htmlFor="allowDataUsage"
-                  className="text-sm text-white/60 leading-relaxed cursor-pointer"
-                >
-                  I consent to Lokah using my data to create meaningful Alternate Self experiences
+                <label htmlFor="allowDataUsage" className="text-sm text-[hsl(30_15%_60%)] leading-relaxed cursor-pointer">
+                  I allow Lokah to use my data to create personalized alternate self experiences.
+                  My information will be handled securely and never shared with third parties.
                 </label>
               </div>
             </div>
           );
-
         default:
           return null;
       }
@@ -511,7 +494,7 @@ const Onboarding = () => {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
         >
           {content}
         </motion.div>
@@ -521,182 +504,130 @@ const Onboarding = () => {
 
   const canProceed = () => {
     switch (currentStep) {
-      case 1:
-        return formData.name.trim() !== "" && formData.age.trim() !== "";
-      case 2:
-        return formData.country.trim() !== "";
-      case 3:
-        return formData.occupation.trim() !== "";
-      case 6:
-        return formData.values.trim() !== "";
-      case 7:
-        return formData.majorChoice.trim() !== "" && formData.unchosenPath.trim() !== "";
-      default:
-        return true;
+      case 1: return formData.name.trim() !== "";
+      case 6: return formData.majorChoice.trim() !== "" && formData.unchosenPath.trim() !== "";
+      case 8: return formData.allowDataUsage;
+      default: return true;
     }
   };
 
   const getStepTitle = () => {
-    const titles = [
-      "Let's start with you",
-      "Where are you from?",
-      "Your education & work",
-      "About your family",
-      "Your economic landscape",
-      "Your inner world",
-      "Your life choices",
-      "Reflections & consent"
-    ];
+    const titles = ["Identity", "Location", "Education", "Family", "Background", "Choices", "Personality", "Ready"];
     return titles[currentStep - 1] || "";
   };
 
-  const getStepDescription = () => {
-    const descriptions = [
-      "Tell me your name and a bit about yourself",
-      "Understanding your cultural and geographical context",
-      "Your professional and educational journey",
-      "The people and relationships that matter",
-      "Your financial situation and work stability",
-      "What drives you and what you value most",
-      "The paths you took and those you didn't",
-      "Final thoughts and your permission"
-    ];
-    return descriptions[currentStep - 1] || "";
-  };
+  const StepIcon = stepIcons[currentStep - 1];
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-[hsl(220 25% 4%)]" />
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse 100% 80% at 50% -20%, hsl(35 35% 65% / 0.12) 0%, transparent 60%)',
-        }}
-        animate={{
-          opacity: [0.5, 0.8, 0.5],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse 80% 60% at 70% 120%, hsl(35 35% 65% / 0.1) 0%, transparent 60%)',
-        }}
-        animate={{
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
-
-      <div className="relative z-10 w-full max-w-2xl space-y-6">
-        {/* Header */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="mx-auto mb-4">
-            <Logo size={28} />
+    <div className="relative min-h-screen flex bg-[hsl(30_15%_6%)]">
+      {/* Left Panel - Progress */}
+      <div className="hidden lg:flex w-80 flex-col justify-between p-8 border-r border-[hsl(35_20%_12%)]">
+        <div>
+          <Logo size={28} />
+          <div className="mt-12 space-y-1">
+            {Array.from({ length: TOTAL_STEPS }).map((_, i) => {
+              const Icon = stepIcons[i];
+              const isComplete = i + 1 < currentStep;
+              const isCurrent = i + 1 === currentStep;
+              return (
+                <motion.div
+                  key={i}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${isCurrent
+                    ? 'bg-[hsl(35_35%_65%/0.1)] border border-[hsl(35_35%_65%/0.2)]'
+                    : isComplete
+                      ? 'opacity-60'
+                      : 'opacity-30'
+                    }`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isCurrent
+                    ? 'bg-[hsl(35_35%_65%)] text-[hsl(30_15%_6%)]'
+                    : isComplete
+                      ? 'bg-[hsl(35_35%_65%/0.3)] text-[hsl(35_35%_65%)]'
+                      : 'bg-[hsl(30_12%_15%)] text-[hsl(30_15%_40%)]'
+                    }`}>
+                    {isComplete ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                      <Icon className="w-4 h-4" />
+                    )}
+                  </div>
+                  <span className={`text-sm font-medium ${isCurrent ? 'text-[hsl(38_40%_85%)]' : 'text-[hsl(30_15%_50%)]'}`}>
+                    Step {i + 1}
+                  </span>
+                </motion.div>
+              );
+            })}
           </div>
-          <p className="text-white/40 text-sm">Preparing your Alternate Self</p>
-        </motion.div>
+        </div>
 
-        {/* Progress Section */}
-        <motion.div
-          className="space-y-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex justify-between text-sm text-white/50">
-            <span>Step {currentStep} of {TOTAL_STEPS}</span>
-            <span>{Math.round(progress)}% complete</span>
+        {/* Progress indicator */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs text-[hsl(30_15%_45%)]">
+            <span>Progress</span>
+            <span>{Math.round(progress)}%</span>
           </div>
-
-          {/* Custom Progress Bar */}
-          <div className="relative h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+          <div className="h-1 bg-[hsl(30_12%_12%)] rounded-full overflow-hidden">
             <motion.div
-              className="absolute inset-y-0 left-0 rounded-full"
-              style={{
-                background: 'linear-gradient(90deg, hsl(35 35% 65%), hsl(35 35% 65%))',
-              }}
+              className="h-full bg-[hsl(35_35%_65%)] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
+              transition={{ duration: 0.3 }}
             />
-            {/* Glow effect */}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Mobile Header */}
+        <div className="lg:hidden p-4 border-b border-[hsl(35_20%_12%)]">
+          <div className="flex items-center justify-between">
+            <Logo size={24} />
+            <span className="text-xs text-[hsl(30_15%_50%)]">Step {currentStep} of {TOTAL_STEPS}</span>
+          </div>
+          {/* Mobile Progress Bar */}
+          <div className="mt-3 h-1 bg-[hsl(30_12%_12%)] rounded-full overflow-hidden">
             <motion.div
-              className="absolute inset-y-0 left-0 rounded-full blur-sm"
-              style={{
-                background: 'linear-gradient(90deg, hsl(35 35% 65%), hsl(35 35% 65%))',
-                opacity: 0.5,
-              }}
+              className="h-full bg-[hsl(35_35%_65%)] rounded-full"
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
             />
           </div>
+        </div>
 
-          {/* Step Indicators */}
-          <div className="flex justify-between px-1">
-            {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-              <motion.div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i + 1 <= currentStep
-                    ? 'bg-[hsl(35_35%_65%)]'
-                    : 'bg-white/10'
-                  }`}
-                animate={{
-                  scale: i + 1 === currentStep ? [1, 1.3, 1] : 1,
-                }}
-                transition={{ duration: 1, repeat: i + 1 === currentStep ? Infinity : 0 }}
-              />
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Main Card */}
-        <motion.div
-          className="relative overflow-hidden rounded-2xl p-8 md:p-10"
-          style={{
-            background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.9) 0%, hsl(222 47% 4% / 0.95) 100%)',
-            border: '1px solid hsl(0 0% 100% / 0.06)',
-            boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.5), 0 0 40px -10px hsl(35 35% 65% / 0.1)',
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {/* Card glow effect */}
-          <div
-            className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 pointer-events-none"
-            style={{ background: 'hsl(35 35% 65%)' }}
-          />
-
-          <div className="relative z-10 space-y-6">
+        {/* Form Area */}
+        <div className="flex-1 flex items-center justify-center p-6 md:p-12">
+          <motion.div
+            className="w-full max-w-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             {/* Step Header */}
-            <div>
-              <motion.h2
-                className="text-2xl font-['Clash_Display'] font-semibold text-transparent bg-clip-text mb-2"
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, hsl(42 90% 60%) 0%, hsl(35 35% 65%) 100%)',
-                }}
+            <div className="mb-8">
+              <motion.div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(35_35%_65%/0.1)] border border-[hsl(35_35%_65%/0.2)] mb-4"
+                key={`badge-${currentStep}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <StepIcon className="w-3.5 h-3.5 text-[hsl(35_35%_65%)]" />
+                <span className="text-xs font-medium text-[hsl(35_35%_65%)] uppercase tracking-wider">{getStepTitle()}</span>
+              </motion.div>
+              <motion.h1
+                className="text-3xl font-display font-semibold text-[hsl(38_40%_90%)]"
                 key={`title-${currentStep}`}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
               >
-                {getStepTitle()}
-              </motion.h2>
+                Tell us about yourself
+              </motion.h1>
               <motion.p
-                className="text-white/40"
+                className="mt-2 text-[hsl(30_15%_55%)]"
                 key={`desc-${currentStep}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
               >
-                {getStepDescription()}
+                This helps create a more personalized experience
               </motion.p>
             </div>
 
@@ -705,37 +636,42 @@ const Onboarding = () => {
               {renderStep()}
             </div>
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between pt-4 gap-4">
+            {/* Navigation */}
+            <div className="flex justify-between pt-8 gap-4">
               <GlassButton
                 variant="secondary"
                 onClick={handleBack}
                 disabled={currentStep === 1}
                 label="Back"
                 size="md"
-                className="min-w-[120px]"
               />
-
               {currentStep < TOTAL_STEPS ? (
                 <GlassButton
                   onClick={handleNext}
                   disabled={!canProceed()}
                   label="Continue"
                   size="md"
-                  className="min-w-[140px]"
                 />
               ) : (
                 <GlassButton
                   onClick={handleComplete}
                   disabled={!canProceed() || isLoading}
-                  label={isLoading ? "Creating..." : "Begin with Lokah"}
+                  label={
+                    isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Creating...
+                      </span>
+                    ) : (
+                      "Begin with Lokah"
+                    )
+                  }
                   size="md"
-                  className="min-w-[180px]"
                 />
               )}
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

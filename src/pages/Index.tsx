@@ -18,14 +18,14 @@ const Index = () => {
   }, [user, navigate]);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[hsl(220 25% 4%)]">
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[hsl(30 15% 6%)]">
       {/* Background */}
       <div
         className="absolute inset-0 -z-10"
         style={{
           background: `
             radial-gradient(ellipse 60% 40% at 50% 50%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />

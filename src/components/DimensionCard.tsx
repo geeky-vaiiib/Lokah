@@ -150,7 +150,7 @@ export const DimensionCard: React.FC<DimensionCardProps> = ({
             <div className="relative z-10 mt-auto" style={{ transform: "translateZ(15px)" }}>
                 <h3
                     className={`
-            text-xl font-['Clash_Display'] font-semibold mb-2 transition-colors duration-300
+            text-xl font-display font-semibold mb-2 transition-colors duration-300
             ${isSelected ? "text-[hsl(35_35%_65%)]" : "text-white"}
           `}
                 >

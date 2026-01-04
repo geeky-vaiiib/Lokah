@@ -32,7 +32,7 @@ const About = () => {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[hsl(220 25% 4%)] font-[Outfit]">
+    <div className="relative min-h-screen overflow-hidden bg-[hsl(30 15% 6%)] font-[Outfit]">
       {/* Background */}
       <div
         className="fixed inset-0 -z-10"
@@ -40,7 +40,7 @@ const About = () => {
           background: `
             radial-gradient(ellipse 100% 80% at 30% -30%, hsl(35 35% 65% / 0.1) 0%, transparent 50%),
             radial-gradient(ellipse 80% 60% at 70% 120%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />
@@ -70,7 +70,7 @@ const About = () => {
         <div
           className="absolute inset-0 -z-10"
           style={{
-            background: 'hsl(222 47% 3% / 0.6)',
+            background: 'hsl(30 15% 6% / 0.6)',
             backdropFilter: 'blur(16px)',
             borderBottom: '1px solid hsl(0 0% 100% / 0.04)',
           }}
@@ -101,7 +101,7 @@ const About = () => {
               <Logo size={64} variant="icon" />
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-['Clash_Display'] font-bold">
+            <h1 className="text-4xl md:text-6xl font-display font-bold">
               <span className="text-white">The Philosophy of </span>
               <span
                 className="text-transparent bg-clip-text"
@@ -128,12 +128,12 @@ const About = () => {
             <Card
               className="p-8 md:p-10"
               style={{
-                background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.8) 0%, hsl(30 12% 7% / 0.9) 100%)',
                 border: '1px solid hsl(0 0% 100% / 0.06)',
               }}
             >
               <div className="text-center mb-10">
-                <h2 className="text-2xl font-['Clash_Display'] font-semibold text-white mb-4">
+                <h2 className="text-2xl font-display font-semibold text-white mb-4">
                   The Circle of Self-Discovery
                 </h2>
                 <p className="text-white/50 leading-relaxed max-w-2xl mx-auto">
@@ -176,11 +176,11 @@ const About = () => {
             <Card
               className="p-8 md:p-10 text-center"
               style={{
-                background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.8) 0%, hsl(30 12% 7% / 0.9) 100%)',
                 border: '1px solid hsl(0 0% 100% / 0.06)',
               }}
             >
-              <h2 className="text-2xl font-['Clash_Display'] font-semibold text-white mb-6">
+              <h2 className="text-2xl font-display font-semibold text-white mb-6">
                 Our Mission
               </h2>
               <div className="space-y-4 max-w-2xl mx-auto">

@@ -94,7 +94,7 @@ export const CosmicButton: React.FC<CosmicButtonProps> = ({
                         />
                     ) : (
                         <>
-                            <span className={`font-['Clash_Display'] tracking-[0.1em] font-semibold uppercase transition-colors duration-200 ${isHovered ? 'text-[hsl(45_50%_92%)]' : 'text-[hsl(38_40%_85%)]'}`}>
+                            <span className={`font-display tracking-[0.1em] font-semibold uppercase transition-colors duration-200 ${isHovered ? 'text-[hsl(45_50%_92%)]' : 'text-[hsl(38_40%_85%)]'}`}>
                                 {label}
                             </span>
                             <motion.svg

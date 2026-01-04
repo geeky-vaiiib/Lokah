@@ -68,6 +68,7 @@ const Chat = () => {
   const [currentSentiment, setCurrentSentiment] = useState<ReturnType<typeof analyzeSentiment> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [toneTags, setToneTags] = useState<string[]>([]);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     if (!alternateSelfId || !userId) {
@@ -91,12 +92,13 @@ const Chat = () => {
       setAlternateSelf(selfResult.data);
       setUser(userResult.data);
 
+      // Use maybeSingle() to avoid 406 error when no conversation exists
       const { data: existingConv } = await supabase
         .from("conversations")
         .select("*")
         .eq("user_id", userId)
         .eq("alternate_self_id", alternateSelfId)
-        .single();
+        .maybeSingle();
 
       if (existingConv) {
         setConversationId(existingConv.id);
@@ -285,7 +287,7 @@ const Chat = () => {
 
   if (!alternateSelf || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[hsl(220 25% 4%)]" aria-busy="true" aria-live="polite">
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(30 15% 6%)]" aria-busy="true" aria-live="polite">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -299,7 +301,7 @@ const Chat = () => {
   }
 
   return (
-    <div className="relative min-h-screen p-4 md:p-6 bg-[hsl(220 25% 4%)] overflow-hidden">
+    <div className="relative min-h-screen p-4 md:p-6 bg-[hsl(30 15% 6%)] overflow-hidden">
       <MoodBackground toneTags={toneTags} />
 
       {/* Gradient Background */}
@@ -309,7 +311,7 @@ const Chat = () => {
           background: `
             radial-gradient(ellipse 80% 60% at 20% -20%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
             radial-gradient(ellipse 60% 40% at 80% 0%, hsl(35 35% 65% / 0.06) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />
@@ -364,27 +366,59 @@ const Chat = () => {
             <Card
               className="p-5 md:p-6 h-[600px] flex flex-col overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.8) 0%, hsl(30 12% 7% / 0.9) 100%)',
                 border: '1px solid hsl(0 0% 100% / 0.06)',
                 boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.4), 0 0 30px -10px hsl(35 35% 65% / 0.08)',
               }}
             >
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin">
-                {messages.length === 0 && (
-                  <div className="text-center py-16">
+                {messages.length === 0 && showWelcome && (
+                  <div className="py-8">
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-6"
                     >
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[hsl(35_35%_65%/0.2)] to-[hsl(35_35%_65%/0.2)] flex items-center justify-center">
-                        <Sparkles className="w-7 h-7 text-[hsl(35_35%_65%)]" />
+                      {/* Welcome Message from Parallel Self */}
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(35_35%_65%/0.3)] to-[hsl(35_35%_65%/0.1)] flex items-center justify-center flex-shrink-0">
+                          <span className="text-[hsl(35_35%_65%)] font-semibold text-sm">{user?.name?.charAt(0) || 'P'}</span>
+                        </div>
+                        <div className="bg-white/[0.04] border border-white/[0.06] rounded-2xl px-4 py-3 max-w-[85%]">
+                          <p className="text-white/90 text-sm leading-relaxed">
+                            Hey, it's me — well, the other version of you. {alternateSelf?.divergence_summary} I'm curious about your life too. What do you want to know?
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-white/60 text-lg font-medium mb-2">Start a conversation</p>
-                      <p className="text-white/30 text-sm max-w-sm mx-auto">
-                        Ask your Alternate Self about their life, choices, or perspectives
-                      </p>
+
+                      {/* Conversation Starters */}
+                      <div className="pl-12">
+                        <p className="text-white/40 text-xs mb-3 uppercase tracking-wider">Start the conversation</p>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            "What's your typical day like?",
+                            "Any regrets about your choices?",
+                            "What's the best part of your life?",
+                            "Do you ever think about my path?",
+                            "What would you tell me?"
+                          ].map((suggestion, i) => (
+                            <motion.button
+                              key={i}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.3 + i * 0.1 }}
+                              onClick={() => {
+                                setInput(suggestion);
+                                setShowWelcome(false);
+                              }}
+                              className="px-3 py-2 text-xs rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 hover:bg-[hsl(35_35%_65%/0.15)] hover:text-white hover:border-[hsl(35_35%_65%/0.3)] transition-all"
+                            >
+                              {suggestion}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
                     </motion.div>
                   </div>
                 )}
@@ -401,8 +435,8 @@ const Chat = () => {
                     >
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.role === "user"
-                            ? "bg-gradient-to-r from-[hsl(35_35%_65%/0.15)] to-[hsl(35_35%_65%/0.1)] border border-[hsl(35_35%_65%/0.2)] text-white"
-                            : "bg-white/[0.04] border border-white/[0.06] text-white/90"
+                          ? "bg-gradient-to-r from-[hsl(35_35%_65%/0.15)] to-[hsl(35_35%_65%/0.1)] border border-[hsl(35_35%_65%/0.2)] text-white"
+                          : "bg-white/[0.04] border border-white/[0.06] text-white/90"
                           }`}
                       >
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -486,14 +520,14 @@ const Chat = () => {
         <DialogContent
           className="max-w-2xl"
           style={{
-            background: 'linear-gradient(135deg, hsl(222 47% 6%) 0%, hsl(222 47% 4%) 100%)',
+            background: 'linear-gradient(135deg, hsl(30 12% 10%) 0%, hsl(30 12% 7%) 100%)',
             border: '1px solid hsl(35 35% 65% / 0.2)',
             boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.5), 0 0 40px -10px hsl(35 35% 65% / 0.2)',
           }}
         >
           <DialogHeader>
             <DialogTitle
-              className="text-2xl font-['Clash_Display'] text-transparent bg-clip-text"
+              className="text-2xl font-display text-transparent bg-clip-text"
               style={{
                 backgroundImage: 'linear-gradient(135deg, hsl(35 35% 65%) 0%, hsl(35 35% 65%) 100%)',
               }}

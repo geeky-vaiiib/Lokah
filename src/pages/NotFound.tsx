@@ -13,7 +13,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[hsl(220 25% 4%)] font-[Outfit]">
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[hsl(30 15% 6%)] font-[Outfit]">
       {/* Background */}
       <div
         className="absolute inset-0 -z-10"
@@ -21,7 +21,7 @@ const NotFound = () => {
           background: `
             radial-gradient(ellipse 60% 40% at 50% 30%, hsl(35 35% 65% / 0.12) 0%, transparent 50%),
             radial-gradient(ellipse 40% 30% at 50% 70%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />
@@ -72,7 +72,7 @@ const NotFound = () => {
 
         {/* 404 Text */}
         <motion.h1
-          className="text-8xl md:text-9xl font-['Clash_Display'] font-bold mb-4"
+          className="text-8xl md:text-9xl font-display font-bold mb-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}

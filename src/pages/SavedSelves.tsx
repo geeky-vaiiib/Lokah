@@ -58,7 +58,7 @@ const SavedSelves = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[hsl(220 25% 4%)]">
+      <div className="min-h-screen flex items-center justify-center bg-[hsl(30 15% 6%)]">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -72,7 +72,7 @@ const SavedSelves = () => {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-[hsl(220 25% 4%)]">
+    <div className="min-h-screen p-6 bg-[hsl(30 15% 6%)]">
       {/* Background Effects */}
       <div
         className="fixed inset-0 -z-10"
@@ -80,7 +80,7 @@ const SavedSelves = () => {
           background: `
             radial-gradient(ellipse 100% 80% at 30% -30%, hsl(35 35% 65% / 0.1) 0%, transparent 50%),
             radial-gradient(ellipse 80% 60% at 70% 120%, hsl(35 35% 65% / 0.08) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />
@@ -97,7 +97,7 @@ const SavedSelves = () => {
             <Logo size={36} />
             <div>
               <h1
-                className="text-3xl md:text-4xl font-['Clash_Display'] font-bold text-transparent bg-clip-text"
+                className="text-3xl md:text-4xl font-display font-bold text-transparent bg-clip-text"
                 style={{
                   backgroundImage: 'linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(35 35% 65%) 100%)',
                 }}
@@ -134,7 +134,7 @@ const SavedSelves = () => {
             <Card
               className="p-16 text-center"
               style={{
-                background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.8) 0%, hsl(30 12% 7% / 0.9) 100%)',
                 border: '1px solid hsl(0 0% 100% / 0.06)',
               }}
             >
@@ -147,7 +147,7 @@ const SavedSelves = () => {
                   <Sparkles className="w-9 h-9 text-[hsl(35_35%_65%)]" />
                 </div>
                 <h2
-                  className="text-2xl font-['Clash_Display'] font-semibold text-transparent bg-clip-text mb-3"
+                  className="text-2xl font-display font-semibold text-transparent bg-clip-text mb-3"
                   style={{
                     backgroundImage: 'linear-gradient(135deg, hsl(35 35% 65%) 0%, hsl(35 35% 65%) 100%)',
                   }}
@@ -174,7 +174,7 @@ const SavedSelves = () => {
               <TabsList
                 className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 p-1 rounded-xl"
                 style={{
-                  background: 'hsl(222 47% 6% / 0.8)',
+                  background: 'hsl(30 12% 10% / 0.8)',
                   border: '1px solid hsl(0 0% 100% / 0.06)',
                 }}
               >
@@ -217,7 +217,7 @@ const SavedSelves = () => {
                           <Card
                             className="p-6 cursor-pointer group transition-all duration-300"
                             style={{
-                              background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.8) 0%, hsl(222 47% 4% / 0.9) 100%)',
+                              background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.8) 0%, hsl(30 12% 7% / 0.9) 100%)',
                               border: '1px solid hsl(0 0% 100% / 0.06)',
                             }}
                             onClick={() => navigate("/chat", { state: { alternateSelfId: self.id, userId } })}
@@ -242,7 +242,7 @@ const SavedSelves = () => {
                                 >
                                   {self.axis}
                                 </span>
-                                <h3 className="text-xl font-['Clash_Display'] font-semibold text-white mb-2 group-hover:text-[hsl(35_35%_65%)] transition-colors">
+                                <h3 className="text-xl font-display font-semibold text-white mb-2 group-hover:text-[hsl(35_35%_65%)] transition-colors">
                                   Alternate Self
                                 </h3>
                                 <p className="text-sm text-white/40 line-clamp-2 leading-relaxed">

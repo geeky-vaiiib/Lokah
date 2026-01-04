@@ -10,7 +10,7 @@ export default function Welcome() {
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -50]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-[Outfit] selection:bg-[hsl(35_35%_65%/0.3)] selection:text-white bg-[hsl(220 25% 4%)] text-left">
+    <div className="relative min-h-screen overflow-hidden font-[Outfit] selection:bg-[hsl(35_35%_65%/0.3)] selection:text-white bg-[hsl(30 15% 6%)] text-left">
 
       {/* Global Effects */}
       <div className="scanlines" />
@@ -49,7 +49,7 @@ export default function Welcome() {
         <motion.div
           className="absolute inset-0 -z-10 transition-all duration-300"
           style={{
-            background: 'hsl(222 47% 3% / 0.5)',
+            background: 'hsl(30 15% 6% / 0.5)',
             backdropFilter: 'blur(12px)',
             borderBottom: '1px solid hsl(0 0% 100% / 0.04)',
           }}
@@ -110,7 +110,7 @@ export default function Welcome() {
           {/* Headline */}
           <div className="flex flex-col gap-3">
             <motion.h1
-              className="text-6xl md:text-8xl font-['Clash_Display'] font-bold text-white leading-[0.95] tracking-tight"
+              className="text-6xl md:text-8xl font-display font-bold text-white leading-[0.95] tracking-tight"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
@@ -199,7 +199,7 @@ export default function Welcome() {
 
               {/* Floating Data Points */}
               <motion.div
-                className="absolute -right-16 top-4 text-[9px] font-mono text-[hsl(35_35%_65%/0.8)] bg-[hsl(220 25% 4%)]/80 px-3 py-1.5 border border-[hsl(35_35%_65%/0.2)] backdrop-blur-md rounded-sm"
+                className="absolute -right-16 top-4 text-[9px] font-mono text-[hsl(35_35%_65%/0.8)] bg-[hsl(30 15% 6%)]/80 px-3 py-1.5 border border-[hsl(35_35%_65%/0.2)] backdrop-blur-md rounded-sm"
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               >
@@ -207,7 +207,7 @@ export default function Welcome() {
               </motion.div>
 
               <motion.div
-                className="absolute -left-12 bottom-8 text-[9px] font-mono text-[hsl(35_35%_65%/0.8)] bg-[hsl(220 25% 4%)]/80 px-3 py-1.5 border border-[hsl(35_35%_65%/0.2)] backdrop-blur-md rounded-sm"
+                className="absolute -left-12 bottom-8 text-[9px] font-mono text-[hsl(35_35%_65%/0.8)] bg-[hsl(30 15% 6%)]/80 px-3 py-1.5 border border-[hsl(35_35%_65%/0.2)] backdrop-blur-md rounded-sm"
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
               >

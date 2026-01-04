@@ -82,7 +82,7 @@ const Auth = () => {
   `;
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden bg-[hsl(220 25% 4%)] font-[Outfit]">
+    <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden bg-[hsl(30 15% 6%)] font-[Outfit]">
 
       {/* Background */}
       <div
@@ -91,7 +91,7 @@ const Auth = () => {
           background: `
             radial-gradient(ellipse 80% 60% at 50% -20%, hsl(35 35% 65% / 0.15) 0%, transparent 50%),
             radial-gradient(ellipse 60% 40% at 80% 100%, hsl(35 35% 65% / 0.1) 0%, transparent 50%),
-            hsl(222 47% 3%)
+            hsl(30 15% 6%)
           `,
         }}
       />
@@ -128,7 +128,7 @@ const Auth = () => {
       <motion.div
         className="relative z-20 w-full max-w-md p-8 md:p-10 mx-4 rounded-2xl overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, hsl(222 47% 6% / 0.9) 0%, hsl(222 47% 4% / 0.95) 100%)',
+          background: 'linear-gradient(135deg, hsl(30 12% 10% / 0.9) 0%, hsl(30 12% 7% / 0.95) 100%)',
           border: '1px solid hsl(0 0% 100% / 0.06)',
           boxShadow: '0 25px 50px -12px hsl(0 0% 0% / 0.5), 0 0 40px -10px hsl(35 35% 65% / 0.1)',
         }}
@@ -159,7 +159,7 @@ const Auth = () => {
           transition={{ delay: 0.3 }}
         >
           <h2
-            className="text-3xl font-['Clash_Display'] text-center mb-2 font-semibold text-transparent bg-clip-text"
+            className="text-3xl font-display text-center mb-2 font-semibold text-transparent bg-clip-text"
             style={{
               backgroundImage: 'linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(35 35% 65%) 100%)',
             }}

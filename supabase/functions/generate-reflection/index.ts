@@ -1,108 +1,85 @@
 // deno-lint-ignore-file
-// Minimal Deno env declaration for local TS checks
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const Deno: { env: { get(name: string): string | undefined } };
-// @ts-expect-error - Deno remote module import for local TS
+// @ts-expect-error - Deno remote module import
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { LOKAH_SYSTEM_PROMPT } from "../_shared/prompt.ts";
-
-const AI_API_KEY = Deno.env.get("LOKAH_AI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
-const AI_GATEWAY_URL = Deno.env.get('AI_GATEWAY_URL') || 'https://api.openai.com/v1/chat/completions';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-  const { messages, alternateSelfData }: { messages: Array<{ role: string; content: string; timestamp?: string }>; alternateSelfData: { axis: string; divergence_summary: string; backstory: string } } = await req.json();
+    const { messages, alternateSelf, userName } = await req.json();
+    console.log('Generating reflection');
 
-    if (!AI_API_KEY) {
-      throw new Error("AI API key is not configured");
+    const GOOGLE_AI_KEY = Deno.env.get('GOOGLE_AI_API_KEY');
+    if (!GOOGLE_AI_KEY) {
+      throw new Error('Google AI API key not configured');
     }
 
-  const systemPrompt = `You are a reflection assistant analyzing a conversation between someone and their alternate self from a parallel reality.
+    const conversationSummary = (messages || []).slice(-10).map((m: { role: string, content: string }) =>
+      `${m.role}: ${m.content}`
+    ).join('\n');
 
-The alternate self's context:
-- Divergence axis: ${alternateSelfData.axis}
-- Different life path: ${alternateSelfData.divergence_summary}
-- Backstory: ${alternateSelfData.backstory}
+    const prompt = `Based on this conversation between ${userName || 'someone'} and their alternate self, write a SHORT personal reflection.
 
-Your task: Generate a reflective summary with:
-1. A poetic title (5-8 words)
-2. Three insights as bullet points - each exploring what this conversation reveals about the user's real life, values, or unchosen paths
-3. An emotional tone (one word: reflective, hopeful, nostalgic, curious, etc.)
+Conversation:
+${conversationSummary}
 
-Format your response as JSON:
-{
-  "title": "string",
-  "insights": ["string", "string", "string"],
-  "emotional_tone": "string"
-}`;
+About the alternate self:
+${alternateSelf?.backstory || 'They took a different path in life.'}
 
-    const contextBlob = {
-      task: 'reflection_summary',
-      parallel_self: {
-        axis: alternateSelfData.axis,
-        backstory: alternateSelfData.backstory,
-        divergence_summary: alternateSelfData.divergence_summary,
-      },
-      conversation_history: messages.slice(-10)
-    };
+Write a brief, honest reflection (2-3 sentences) that:
+- Points out something interesting they learned
+- Keeps it real and grounded (not poetic)
+- Sounds like a friend giving honest feedback
 
-  const response = await fetch(AI_GATEWAY_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${AI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-      { role: "system", content: LOKAH_SYSTEM_PROMPT },
-      { role: "system", content: systemPrompt },
-          { role: "user", content: `Context:\n${JSON.stringify(contextBlob, null, 2)}\n\nAnalyze this conversation and generate a reflection JSON.` }
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.4,
-        max_tokens: 300
-      }),
-    });
+Example good reflection:
+"Sounds like your other self found peace by slowing down - maybe there's something there for you too. Not saying quit your job, but what if you took more breaks?"
+
+Write ONLY the reflection text, no quotes, no labels:`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GOOGLE_AI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 150,
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limits exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Payment required. Please add funds to your workspace." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("Failed to generate reflection");
+      console.error('Gemini API error:', response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    const reflection = JSON.parse(data.choices[0].message.content);
+    const aiData = await response.json();
+    let reflection = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    reflection = reflection.trim().replace(/^["']|["']$/g, '');
 
+    console.log('Generated reflection');
     return new Response(JSON.stringify({ reflection }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error: unknown) {
-    console.error("Error in generate-reflection:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    console.error('Error in generate-reflection:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
