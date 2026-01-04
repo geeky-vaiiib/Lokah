@@ -93,7 +93,7 @@ const Generator = () => {
         toast.error("Failed to load user data");
         navigate("/onboarding");
       } else {
-        setUser(data);
+        setUser(data as unknown as UserRecord);
       }
     };
 
